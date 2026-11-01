@@ -1,22 +1,22 @@
 import os
 from pathlib import Path
-
+ 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-
+ 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
-
-
+ 
+ 
 def env(name, default=None):
     return os.environ.get(name, default)
-
-
+ 
+ 
 def env_bool(name, default=False):
     return str(os.environ.get(name, str(default))).strip().lower() in ("1", "true", "yes", "on")
-
-
+ 
+ 
 # ---------------------------------------------------------------- core
 DEBUG = env_bool("DJANGO_DEBUG", False)
 SECRET_KEY = env("DJANGO_SECRET_KEY")
@@ -25,11 +25,22 @@ if not SECRET_KEY:
         SECRET_KEY = "dev-only-insecure-key-do-not-use-in-production"
     else:
         raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is False.")
-
-ALLOWED_HOSTS = [h.strip() for h in env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
-SITE_URL = env("SITE_URL", "http://localhost:8000").rstrip("/")
-
+ 
+def _host(value):
+    """Accept 'https://example.com/' or 'example.com' and return just the hostname."""
+    return value.strip().replace("https://", "").replace("http://", "").strip("/")
+ 
+ 
+ALLOWED_HOSTS = [_host(h) for h in env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+# Render tells every service its own public hostname; trust it automatically so a typo cannot lock the site out.
+RENDER_HOST = env("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RENDER_HOST)
+CSRF_TRUSTED_ORIGINS = [o.strip().rstrip("/") for o in env("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
+if RENDER_HOST and f"https://{RENDER_HOST}" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_HOST}")
+SITE_URL = (env("SITE_URL", "") or (f"https://{RENDER_HOST}" if RENDER_HOST else "http://localhost:8000")).rstrip("/")
+ 
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -52,7 +63,7 @@ INSTALLED_APPS = [
     "marketing",
     "dashboard",
 ]
-
+ 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -64,10 +75,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.ReferralCaptureMiddleware",
 ]
-
+ 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
-
+ 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -84,7 +95,7 @@ TEMPLATES = [
         },
     },
 ]
-
+ 
 # ---------------------------------------------------------------- database
 DATABASES = {
     "default": dj_database_url.config(
@@ -94,7 +105,7 @@ DATABASES = {
     )
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
+ 
 # ---------------------------------------------------------------- auth
 AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "accounts:login"
@@ -107,36 +118,36 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 3
-
+ 
 # ---------------------------------------------------------------- i18n
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 USE_TZ = True
-
+ 
 # ---------------------------------------------------------------- static / media
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
+ 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
-
+ 
 CLOUDINARY_URL = env("CLOUDINARY_URL", "")
 if CLOUDINARY_URL:
     # cloudinary_storage must come before staticfiles; cloudinary after it.
     INSTALLED_APPS = ["cloudinary_storage"] + INSTALLED_APPS + ["cloudinary"]
     STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
-
+ 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 DATA_UPLOAD_MAX_NUMBER_FILES = 30
 MAX_IMAGE_UPLOAD_MB = 5
-
+ 
 # ---------------------------------------------------------------- email
 EMAIL_BACKEND = env(
     "EMAIL_BACKEND",
@@ -150,7 +161,7 @@ EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 EMAIL_TIMEOUT = 20
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "A&M Home Appliances <no-reply@localhost>")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
-
+ 
 # ---------------------------------------------------------------- celery
 CELERY_BROKER_URL = env("REDIS_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = None
@@ -166,14 +177,14 @@ CELERY_BEAT_SCHEDULE = {
     "retry-failed-emails": {"task": "notifications.tasks.retry_failed_emails", "schedule": 300.0},
     "expire-unpaid-orders": {"task": "orders.tasks.expire_unpaid_orders", "schedule": 900.0},
 }
-
+ 
 # ---------------------------------------------------------------- paystack
 PAYSTACK_MODE = env("PAYSTACK_MODE", "test").lower()
 if PAYSTACK_MODE not in ("test", "live"):
     raise ImproperlyConfigured("PAYSTACK_MODE must be 'test' or 'live'.")
 PAYSTACK_SECRET_KEY = env(f"PAYSTACK_{PAYSTACK_MODE.upper()}_SECRET_KEY", "")
 PAYSTACK_PUBLIC_KEY = env(f"PAYSTACK_{PAYSTACK_MODE.upper()}_PUBLIC_KEY", "")
-
+ 
 # ---------------------------------------------------------------- security
 if not DEBUG:
     SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)
@@ -189,7 +200,7 @@ X_FRAME_OPTIONS = "DENY"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
-
+ 
 # ---------------------------------------------------------------- logging
 LOGGING = {
     "version": 1,
@@ -198,3 +209,4 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "std"}},
     "root": {"handlers": ["console"], "level": "INFO"},
 }
+ 
