@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}My orders - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding-bottom:64px">
+  <h1 style="font-size:clamp(1.6rem,3vw,2.3rem);padding-top:28px">My orders</h1>
+  {% if page.object_list %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>{% for o in page.object_list %}
+      <tr><td><strong>{{ o.number }}</strong></td><td>{{ o.created_at|date:"j M Y" }}</td><td>{{ o.items.all|length }}</td><td>{{ o.total|naira }}</td>
+        <td><span class="status {{ o.status }}">{{ o.get_status_display }}</span></td><td><a class="btn btn-sm btn-ghost" href="{% url 'orders:detail' o.number %}">View</a></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% if page.has_other_pages %}<nav class="pager">{% if page.has_previous %}<a href="?page={{ page.previous_page_number }}">&larr; Prev</a>{% endif %}<span class="current">{{ page.number }}</span>{% if page.has_next %}<a href="?page={{ page.next_page_number }}">Next &rarr;</a>{% endif %}</nav>{% endif %}
+  {% else %}<div class="empty"><div class="big">&#128230;</div><h3>No orders yet</h3><a class="btn btn-navy" href="{% url 'catalog:list' %}">Start shopping</a></div>{% endif %}
+</div>
+{% endblock %}

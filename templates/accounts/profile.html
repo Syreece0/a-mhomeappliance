@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Profile - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container"><div class="auth-wrap" style="max-width:680px">
+  <div class="card stack">
+    <h1 style="font-size:2rem">Profile &amp; contact details</h1>
+    <p class="muted">Email: <strong>{{ user.email }}</strong></p>
+    <form method="post" class="stack">{% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="form-grid">
+        <div class="field"><label for="{{ form.first_name.id_for_label }}">First name</label>{{ form.first_name }}{{ form.first_name.errors }}</div>
+        <div class="field"><label for="{{ form.last_name.id_for_label }}">Last name</label>{{ form.last_name }}{{ form.last_name.errors }}</div>
+        <div class="field"><label for="{{ form.phone.id_for_label }}">Phone</label>{{ form.phone }}{{ form.phone.errors }}</div>
+        <div class="field"><label for="{{ form.state.id_for_label }}">State</label>{{ form.state }}</div>
+        <div class="field"><label for="{{ form.city.id_for_label }}">City</label>{{ form.city }}</div>
+      </div>
+      <div class="field"><label for="{{ form.address.id_for_label }}">Delivery address</label>{{ form.address }}</div>
+      <label><input class="form-check" type="checkbox" name="marketing_opt_in" {% if form.marketing_opt_in.value %}checked{% endif %}>{{ form.marketing_opt_in.label }}</label>
+      <p class="help">Order and payment emails are always sent. This only controls promotional emails.</p>
+      <div class="row"><button class="btn btn-navy" type="submit">Save changes</button><a class="btn btn-ghost" href="{% url 'accounts:password_change' %}">Change password</a></div>
+    </form>
+  </div>
+</div></div>
+{% endblock %}

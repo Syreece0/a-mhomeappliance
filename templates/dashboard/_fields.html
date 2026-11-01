@@ -1,0 +1,9 @@
+{{ form.non_field_errors }}
+<div class="form-grid">
+{% for f in form %}{% if not f.is_hidden %}
+  <div class="field" {% if f.field.widget.attrs.rows or f.name == "description" or f.name == "specifications" or f.name == "message" %}style="grid-column:1/-1"{% endif %}>
+    {% if f.field.widget.input_type == "checkbox" %}<label><input class="form-check" type="checkbox" name="{{ f.html_name }}" id="{{ f.id_for_label }}" {% if f.value %}checked{% endif %}>{{ f.label }}</label>
+    {% else %}<label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{% endif %}
+    {% if f.help_text %}<div class="help">{{ f.help_text }}</div>{% endif %}{{ f.errors }}
+  </div>{% else %}{{ f }}{% endif %}{% endfor %}
+</div>

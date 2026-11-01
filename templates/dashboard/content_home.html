@@ -1,0 +1,37 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Website content{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">Website Content Management</h1>
+<p class="muted" style="max-width:70ch">Edit the About Us page, every policy and the contact details here &mdash; no code needed. Changes are saved as a <strong>draft</strong> first; visitors only see them after you press <strong>Publish</strong>. The last published version is always kept.</p>
+
+<div class="card mb" id="about">
+  <h2 style="font-size:1.4rem">1. About Us</h2>
+  {% if about %}
+  <div class="table-wrap"><table class="table"><thead><tr><th>Page</th><th>Status</th><th>Last edited</th><th>Published</th><th></th></tr></thead><tbody>
+    <tr><td><strong>{{ about.title }}</strong></td><td><span class="status {% if about.has_unpublished_changes %}pending{% else %}paid{% endif %}">{{ about.status_label }}</span></td>
+      <td class="small">{{ about.draft_updated_at|date:"j M Y, H:i" }}{% if about.updated_by %}<br>by {{ about.updated_by.display_name }}{% endif %}</td>
+      <td class="small">{% if about.published_at %}{{ about.published_at|date:"j M Y, H:i" }}{% else %}&mdash;{% endif %}</td>
+      <td><div class="row"><a class="btn btn-sm btn-navy" href="{% url 'dashboard:content_page' about.slug %}">Edit</a><a class="btn btn-sm btn-ghost" href="{% url 'dashboard:content_preview' about.slug %}">Preview</a><a class="btn btn-sm btn-ghost" href="{% url 'core:about' %}" target="_blank" rel="noopener">View live</a></div></td></tr>
+  </tbody></table></div>{% endif %}
+</div>
+
+<div class="card mb" id="policies">
+  <h2 style="font-size:1.4rem">2. Privacy and Policies</h2>
+  <div class="table-wrap"><table class="table"><thead><tr><th>Policy</th><th>Status</th><th>Last edited</th><th>Last published</th><th></th></tr></thead><tbody>
+    {% for p in policies %}<tr><td><strong>{{ p.title }}</strong></td>
+      <td><span class="status {% if p.has_unpublished_changes %}pending{% else %}paid{% endif %}">{{ p.status_label }}</span></td>
+      <td class="small">{{ p.draft_updated_at|date:"j M Y, H:i" }}{% if p.updated_by %}<br>by {{ p.updated_by.display_name }}{% endif %}</td>
+      <td class="small">{% if p.published_at %}{{ p.published_at|date:"j M Y, H:i" }}{% else %}&mdash;{% endif %}</td>
+      <td><div class="row"><a class="btn btn-sm btn-navy" href="{% url 'dashboard:content_page' p.slug %}">Edit</a><a class="btn btn-sm btn-ghost" href="{% url 'dashboard:content_preview' p.slug %}">Preview</a><a class="btn btn-sm btn-ghost" href="{{ p.get_absolute_url }}" target="_blank" rel="noopener">View live</a></div></td></tr>{% endfor %}
+  </tbody></table></div>
+  <h3 style="margin-top:24px">Details used inside the policies</h3>
+  <p class="muted small">These appear automatically in the Delivery and Returns policies. Leave a box empty and the policy says the period is confirmed by our team &mdash; no number is invented. Delivery fees, the referral reward amount and the unpaid-order time come from <a href="{% url 'dashboard:settings' %}" style="color:var(--gold-ink);font-weight:800">Settings</a>.</p>
+  <form method="post" class="stack">{% csrf_token %}{% include "dashboard/_fields.html" with form=details %}<div><button class="btn btn-navy">Save policy details</button></div></form>
+</div>
+
+<div class="card" id="contact">
+  <h2 style="font-size:1.4rem">3. Contact Information</h2>
+  <p class="muted">Phone, WhatsApp, email, address, opening hours, social links and instructions. Updates appear on the Contact Us page and in the footer straight away.</p>
+  <div class="row"><a class="btn btn-navy" href="{% url 'dashboard:content_contact' %}">Edit contact information</a><a class="btn btn-ghost" href="{% url 'core:contact' %}" target="_blank" rel="noopener">View live</a></div>
+</div>
+{% endblock %}

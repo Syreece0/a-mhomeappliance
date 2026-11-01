@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static am_tags %}
+{% block title %}{{ biz.business_name }} - Home appliances you can trust{% endblock %}
+{% block content %}
+
+<section class="hero" data-slider aria-roledescription="carousel" aria-label="Featured offers">
+  <div class="slides">
+    {% for s in hero_slides %}
+    <div class="slide" aria-roledescription="slide">
+      {% if s.image %}<img class="bg" src="{{ s.image.url }}" alt="" {% if not forloop.first %}loading="lazy"{% endif %}>{% endif %}
+      <div class="container"><div class="slide-body">
+        <span class="eyebrow">{{ biz.business_name }}</span>
+        <h1>{{ s.title }}</h1>
+        {% if s.subtitle %}<p>{{ s.subtitle }}</p>{% endif %}
+        <div class="hero-actions">
+          <a class="btn btn-gold" href="{{ s.link_url|default:'/shop/' }}">{{ s.button_text|default:"Shop Now" }}</a>
+          <a class="btn btn-ghost" href="#categories">Explore Products</a>
+        </div>
+      </div></div>
+    </div>
+    {% empty %}
+    <div class="slide">
+      <div class="container"><div class="slide-body">
+        <span class="eyebrow">{{ biz.business_name }}</span>
+        <h1>Appliances that make every home work better.</h1>
+        <p>From kitchen essentials to cooling, laundry and entertainment - genuine brands, honest prices and reliable delivery.</p>
+        <div class="hero-actions">
+          <a class="btn btn-gold" href="{% url 'catalog:list' %}">Shop Now</a>
+          <a class="btn btn-ghost" href="#categories">Explore Products</a>
+        </div>
+      </div></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if hero_slides|length > 1 %}
+  <button class="hero-arrow prev" aria-label="Previous slide">&#10094;</button><button class="hero-arrow next" aria-label="Next slide">&#10095;</button>
+  <div class="hero-dots">{% for s in hero_slides %}<button aria-label="Go to slide {{ forloop.counter }}"></button>{% endfor %}</div>
+  {% endif %}
+</section>
+
+<div class="trust"><div class="container">
+  <div><span>&#10003;</span>Genuine products &amp; warranty</div><div><span>&#10003;</span>Secure Paystack payments</div>
+  <div><span>&#10003;</span>Reliable nationwide delivery</div><div><span>&#10003;</span>Earn rewards when friends buy</div>
+</div></div>
+
+<section class="section" id="categories">
+  <div class="container">
+    <div class="section-head" data-anim="bottom"><h2>Shop by Category</h2><a class="link-arrow" href="{% url 'catalog:list' %}">All products &rarr;</a></div>
+    <div class="cat-grid" data-anim-group="0">
+      {% for c in categories %}
+      <a class="cat-tile" data-anim="auto" href="{{ c.get_absolute_url }}">
+        {% if c.image %}<img src="{{ c.image.url }}" alt="" loading="lazy">{% endif %}
+        <strong>{{ c.name }}</strong><small>Browse &rarr;</small>
+      </a>
+      {% empty %}<p class="muted">Categories will appear here once they are added.</p>{% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if featured %}
+<section class="section alt"><div class="container">
+  <div class="section-head" data-anim="left"><h2>Featured Products</h2><a class="link-arrow" href="{% url 'catalog:list' %}">View all &rarr;</a></div>
+  <div class="grid" data-anim-group="1">{% for product in featured %}{% include "catalog/_product_card.html" with anim="auto" %}{% endfor %}</div>
+</div></section>
+{% endif %}
+
+{% if best_sellers %}
+<section class="section"><div class="container">
+  <div class="section-head" data-anim="right"><h2>Best-Selling Products</h2><a class="link-arrow" href="{% url 'catalog:list' %}?sort=popular">See more &rarr;</a></div>
+  <div class="grid" data-anim-group="3">{% for product in best_sellers %}{% include "catalog/_product_card.html" with anim="auto" %}{% endfor %}</div>
+</div></section>
+{% endif %}
+
+{% if promo_banner %}
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="promo" data-anim="scale">
+    <div><span class="eyebrow">Special promotion</span><h2>{{ promo_banner.title }}</h2>{% if promo_banner.subtitle %}<p>{{ promo_banner.subtitle }}</p>{% endif %}
+      <a class="btn btn-gold" href="{{ promo_banner.link_url|default:'/shop/' }}">{{ promo_banner.button_text|default:"Shop Now" }}</a></div>
+    {% if promo_banner.image %}<img class="float" src="{{ promo_banner.image.url }}" alt="{{ promo_banner.title }}" loading="lazy">{% endif %}
+  </div>
+</div></section>
+{% endif %}
+
+{% if new_arrivals %}
+<section class="section alt"><div class="container">
+  <div class="section-head" data-anim="left"><h2>New Arrivals</h2><a class="link-arrow" href="{% url 'catalog:list' %}?sort=newest">See more &rarr;</a></div>
+  <div class="grid" data-anim-group="5">{% for product in new_arrivals %}{% include "catalog/_product_card.html" with anim="auto" %}{% endfor %}</div>
+</div></section>
+{% endif %}
+
+{% if offers %}
+<section class="section"><div class="container">
+  <div class="section-head" data-anim="right"><h2>Special Offers</h2><a class="link-arrow" href="{% url 'catalog:list' %}?discounted=1">All offers &rarr;</a></div>
+  <div class="grid" data-anim-group="2">{% for product in offers %}{% include "catalog/_product_card.html" with anim="auto" %}{% endfor %}</div>
+</div></section>
+{% endif %}
+
+<section class="section alt"><div class="container">
+  <div class="section-head" data-anim="bottom"><h2>Why Choose A&amp;M?</h2></div>
+  <div class="why-grid" data-anim-group="4">
+    <div class="why" data-anim="auto"><div class="ico">&#9989;</div><h3>Genuine products</h3><p class="muted">Quality appliances from trusted brands, backed by warranty.</p></div>
+    <div class="why" data-anim="auto"><div class="ico">&#128274;</div><h3>Secure payments</h3><p class="muted">Every payment is verified with Paystack before your order is confirmed.</p></div>
+    <div class="why" data-anim="auto"><div class="ico">&#128666;</div><h3>Dependable delivery</h3><p class="muted">Track your order from payment to your doorstep.</p></div>
+    <div class="why" data-anim="auto"><div class="ico">&#127873;</div><h3>Refer &amp; earn</h3><p class="muted">Earn store credit when a friend you referred makes their first purchase.</p></div>
+  </div>
+</div></section>
+
+{% if testimonials %}
+<section class="section"><div class="container">
+  <div class="section-head" data-anim="bottom"><h2>What Customers Say</h2></div>
+  <div class="why-grid" data-anim-group="6">
+    {% for r in testimonials %}
+    <figure class="testi" data-anim="auto" style="margin:0">
+      <div class="stars">{{ r.rating|stars }}</div>
+      <blockquote style="margin:10px 0">{{ r.body|truncatechars:220 }}</blockquote>
+      <figcaption class="small muted"><strong style="color:var(--text)">{{ r.user.display_name }}</strong> on <a href="{{ r.product.get_absolute_url }}">{{ r.product.name }}</a>{% if r.is_verified_purchase %} &middot; Verified purchase{% endif %}</figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+</div></section>
+{% endif %}
+
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="newsletter" data-anim="scale">
+    <h2>Get new arrivals &amp; offers first</h2>
+    <p>Subscribe for product announcements and discounts. We never subscribe you automatically, and you can unsubscribe in one click.</p>
+    <form method="post" action="{% url 'marketing:subscribe' %}">{% csrf_token %}
+      <label class="sr-only" for="nl-email">Email address</label>
+      <input class="form-control" id="nl-email" type="email" name="email" placeholder="Your email address" required>
+      <button class="btn btn-gold" type="submit">Subscribe</button>
+    </form>
+  </div>
+</div></section>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}My account - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding-bottom:64px">
+  <h1 style="font-size:clamp(1.6rem,3vw,2.3rem);padding-top:28px">Hello, {{ user.display_name }}</h1>
+  <div class="stat-grid mb">
+    <div class="stat"><small>Orders</small><b>{{ order_total }}</b></div>
+    <div class="stat gold"><small>Referral wallet</small><b>{{ wallet.balance|default:0|naira }}</b></div>
+    <a class="stat" href="{% url 'referrals:wallet' %}"><small>Your referral code</small><b>{{ user.referral_code.code }}</b></a>
+    <a class="stat" href="{% url 'notifications:list' %}"><small>Unread notifications</small><b>{{ unread_count }}</b></a>
+  </div>
+  <div class="row mb"><a class="btn btn-ghost" href="{% url 'orders:list' %}">My orders</a><a class="btn btn-ghost" href="{% url 'wishlist:list' %}">Wishlist</a><a class="btn btn-ghost" href="{% url 'accounts:profile' %}">Profile &amp; contact details</a><a class="btn btn-ghost" href="{% url 'accounts:password_change' %}">Change password</a></div>
+  <h2>Recent orders</h2>
+  {% if recent_orders %}<div class="table-wrap"><table class="table"><thead><tr><th>Order</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>
+    {% for o in recent_orders %}<tr><td>{{ o.number }}</td><td>{{ o.created_at|date:"j M Y" }}</td><td>{{ o.total|naira }}</td><td><span class="status {{ o.status }}">{{ o.get_status_display }}</span></td><td><a class="btn btn-sm btn-ghost" href="{% url 'orders:detail' o.number %}">Track</a></td></tr>{% endfor %}
+  </tbody></table></div>{% else %}<p class="muted">You haven't placed an order yet.</p>{% endif %}
+</div>
+{% endblock %}

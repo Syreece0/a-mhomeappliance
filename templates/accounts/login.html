@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Log in - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container"><div class="auth-wrap">
+  <div class="card stack">
+    <h1 style="font-size:2rem">Welcome back</h1>
+    <form method="post" class="stack">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {{ form.non_field_errors }}
+      <div class="field"><label for="{{ form.username.id_for_label }}">Email</label>{{ form.username }}{{ form.username.errors }}</div>
+      <div class="field"><label for="{{ form.password.id_for_label }}">Password</label>{{ form.password }}{{ form.password.errors }}</div>
+      <button class="btn btn-navy btn-block" type="submit">Log in</button>
+    </form>
+    <p class="small center"><a href="{% url 'accounts:password_reset' %}">Forgot your password?</a></p>
+    <p class="small center">New here? <a href="{% url 'accounts:register' %}{% if next %}?next={{ next|urlencode }}{% endif %}" style="color:var(--gold-ink);font-weight:800">Create an account</a></p>
+  </div>
+</div></div>
+{% endblock %}

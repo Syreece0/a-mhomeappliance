@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}Wishlist - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding-bottom:64px">
+  <h1 style="font-size:clamp(1.6rem,3vw,2.3rem);padding-top:28px">My wishlist</h1>
+  {% if items %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Product</th><th>Price</th><th>Availability</th><th></th></tr></thead>
+    <tbody>{% for it in items %}
+      <tr>
+        <td><div class="row" style="flex-wrap:nowrap"><img src="{{ it.product.image_url }}" alt="" style="width:64px;height:64px;object-fit:contain;background:var(--surface);border-radius:10px"><a href="{{ it.product.get_absolute_url }}"><strong>{{ it.product.name }}</strong></a></div></td>
+        <td><b>{{ it.product.price|naira }}</b>{% if it.product.discount_percent %} <s class="muted small">{{ it.product.previous_price|naira }}</s>{% endif %}</td>
+        <td>{% if it.product.is_in_stock %}<span class="stock in">In stock</span>{% else %}<span class="stock out">Out of stock</span>{% endif %}</td>
+        <td><div class="row">
+          <form method="post" action="{% url 'wishlist:move_to_cart' %}">{% csrf_token %}<input type="hidden" name="product_id" value="{{ it.product_id }}"><button class="btn btn-sm btn-navy" {% if not it.product.is_in_stock %}disabled{% endif %}>Move to cart</button></form>
+          <form method="post" action="{% url 'wishlist:toggle' %}">{% csrf_token %}<input type="hidden" name="product_id" value="{{ it.product_id }}"><input type="hidden" name="next" value="{% url 'wishlist:list' %}"><button class="btn btn-sm btn-ghost">Remove</button></form>
+        </div></td>
+      </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<div class="empty"><div class="big">&#9825;</div><h3>Nothing saved yet</h3><p>Tap the heart on any product to save it here.</p><a class="btn btn-navy" href="{% url 'catalog:list' %}">Browse products</a></div>{% endif %}
+</div>
+{% endblock %}

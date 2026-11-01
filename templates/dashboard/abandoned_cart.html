@@ -1,0 +1,15 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Email automation{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">Email automation</h1>
+<form method="post" class="card stack" style="max-width:640px">{% csrf_token %}
+  <h3>Abandoned cart reminders</h3>
+  <label><input class="form-check" type="checkbox" name="abandoned_cart_enabled" {% if biz.abandoned_cart_enabled %}checked{% endif %}>Send abandoned cart reminders</label>
+  <div class="field"><label for="w">Wait before the first reminder (minutes)</label><input class="form-control" id="w" type="number" min="0" name="abandoned_cart_wait_minutes" value="{{ biz.abandoned_cart_wait_minutes }}"></div>
+  <div class="field"><label for="m">Maximum number of reminders</label><input class="form-control" id="m" type="number" min="0" name="abandoned_cart_max_reminders" value="{{ biz.abandoned_cart_max_reminders }}"></div>
+  <div class="field"><label for="i">Interval between reminders (hours)</label><input class="form-control" id="i" type="number" min="0" name="abandoned_cart_interval_hours" value="{{ biz.abandoned_cart_interval_hours }}"></div>
+  <p class="help">Reminders stop automatically once the items are bought or the cart is emptied, and restart only if the customer changes their cart again.</p>
+  <h3>Promotions</h3>
+  <label><input class="form-check" type="checkbox" name="promo_emails_enabled" {% if biz.promo_emails_enabled %}checked{% endif %}>Promotional emails enabled</label>
+  <div><button class="btn btn-navy">Save</button></div></form>
+{% endblock %}

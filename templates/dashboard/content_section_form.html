@@ -1,0 +1,13 @@
+{% extends "dashboard/base_dash.html" %}
+{% load static %}
+{% block dtitle %}{% if section %}Edit section{% else %}New section{% endif %}{% endblock %}
+{% block dash %}
+<p class="small"><a href="{% url 'dashboard:content_page' page.slug %}" style="color:var(--gold-ink);font-weight:800">&larr; {{ page.title }}</a></p>
+<h1 style="font-size:2rem">{% if section %}Edit section{% else %}New section{% endif %}</h1>
+<form method="post" enctype="multipart/form-data" class="card stack" style="max-width:900px">{% csrf_token %}
+  {% include "dashboard/_fields.html" %}
+  <p class="help">Tip: use <strong>Insert detail</strong> in the editor to add live business details (phone, email, reward amount&hellip;). They update automatically when you change your settings.</p>
+  <div class="row"><button class="btn btn-navy">Save to draft</button><a class="btn btn-ghost" href="{% url 'dashboard:content_page' page.slug %}">Cancel</a></div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/richtext.js' %}" defer></script>{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Create account - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container"><div class="auth-wrap">
+  <div class="card stack">
+    <h1 style="font-size:2rem">Create your account</h1>
+    <p class="muted">Track orders, save a wishlist and earn rewards when friends buy.</p>
+    <form method="post" class="stack">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {{ form.non_field_errors }}
+      <div class="form-grid">
+        <div class="field"><label for="{{ form.first_name.id_for_label }}">First name</label>{{ form.first_name }}{{ form.first_name.errors }}</div>
+        <div class="field"><label for="{{ form.last_name.id_for_label }}">Last name</label>{{ form.last_name }}{{ form.last_name.errors }}</div>
+      </div>
+      <div class="field"><label for="{{ form.email.id_for_label }}">Email</label>{{ form.email }}{{ form.email.errors }}</div>
+      <div class="field"><label for="{{ form.phone.id_for_label }}">Phone number</label>{{ form.phone }}{{ form.phone.errors }}</div>
+      <div class="form-grid">
+        <div class="field"><label for="{{ form.password1.id_for_label }}">Password</label>{{ form.password1 }}{{ form.password1.errors }}</div>
+        <div class="field"><label for="{{ form.password2.id_for_label }}">Confirm password</label>{{ form.password2 }}{{ form.password2.errors }}</div>
+      </div>
+      <div class="field"><label for="{{ form.referral_code.id_for_label }}">Referral code <span class="muted">(optional)</span></label>{{ form.referral_code }}{{ form.referral_code.errors }}
+        <p class="help">Referral codes only credit the friend who referred you after your first successful purchase.</p></div>
+      <label><input class="form-check" type="checkbox" name="marketing_opt_in" {% if form.marketing_opt_in.value %}checked{% endif %}>{{ form.marketing_opt_in.label }}</label>
+      <p class="small muted" style="margin:0">By creating an account you agree to our <a href="{% url 'core:policy' 'terms-and-conditions' %}" target="_blank" rel="noopener" style="color:var(--gold-ink);font-weight:800">Terms and Conditions</a> and acknowledge our <a href="{% url 'core:policy' 'privacy-policy' %}" target="_blank" rel="noopener" style="color:var(--gold-ink);font-weight:800">Privacy Policy</a>. Referral rewards are explained in our <a href="{% url 'core:policy' 'referral-policy' %}" target="_blank" rel="noopener" style="color:var(--gold-ink);font-weight:800">Referral Policy</a>.</p>
+      <button class="btn btn-gold btn-block" type="submit">Create account</button>
+    </form>
+    <p class="small center">Already registered? <a href="{% url 'accounts:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}" style="color:var(--gold-ink);font-weight:800">Log in</a></p>
+  </div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}Your cart - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <h1 style="font-size:clamp(1.6rem,3vw,2.3rem);padding-top:28px">Your cart</h1>
+  {% if items %}
+  <div class="cart-layout">
+    <section class="card" style="padding:8px 24px">
+      {% for w in warnings %}<p class="msg warning" style="margin:12px 0">{{ w }}</p>{% endfor %}
+      {% for item in items %}
+      <div class="line">
+        <a href="{{ item.product.get_absolute_url }}"><img src="{{ item.product.image_url }}" alt="" loading="lazy"></a>
+        <div><a href="{{ item.product.get_absolute_url }}"><strong>{{ item.product.name }}</strong></a>
+          <div class="muted small">{{ item.product.brand }}</div>
+          <div class="price"><b>{{ item.product.price|naira }}</b>{% if item.product.discount_percent %}<s>{{ item.product.previous_price|naira }}</s>{% endif %}</div>
+          <form method="post" action="{% url 'cart:remove' %}" style="margin-top:6px">{% csrf_token %}<input type="hidden" name="product_id" value="{{ item.product_id }}"><button class="btn btn-sm btn-ghost" type="submit">Remove</button></form>
+        </div>
+        <div style="text-align:right">
+          <form method="post" action="{% url 'cart:update' %}">{% csrf_token %}<input type="hidden" name="product_id" value="{{ item.product_id }}">
+            <div class="qty"><button type="button" data-qty="-1" aria-label="Decrease quantity of {{ item.product.name }}">&minus;</button><input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock|default:1 }}" aria-label="Quantity" data-autosubmit><button type="button" data-qty="1" aria-label="Increase quantity of {{ item.product.name }}">+</button></div>
+            <noscript><button class="btn btn-sm btn-navy" type="submit">Update</button></noscript>
+          </form>
+          <div style="margin-top:8px"><strong>{{ item.line_total|naira }}</strong></div>
+        </div>
+      </div>
+      {% endfor %}
+      <p style="padding:16px 0 8px"><a class="link-arrow" href="{% url 'catalog:list' %}">&larr; Continue shopping</a></p>
+    </section>
+    <aside class="card summary">
+      <h3>Order summary</h3>
+      <div class="sum-row"><span>Items ({{ count }})</span><span>{{ subtotal|naira }}</span></div>
+      <div class="sum-row muted small"><span>Delivery</span><span>Calculated at checkout</span></div>
+      <div class="sum-row sum-total"><span>Subtotal</span><span>{{ subtotal|naira }}</span></div>
+      <a class="btn btn-gold btn-block mt" href="{% url 'orders:checkout' %}">Proceed to checkout</a>
+      {% if biz.whatsapp_digits %}<a class="btn btn-wa btn-block" style="margin-top:10px" target="_blank" rel="noopener" href="{% whatsapp_url biz.whatsapp_digits wa_text %}">&#128172; Order via WhatsApp</a>{% endif %}
+    </aside>
+  </div>
+  {% else %}
+  <div class="empty"><div class="big">&#128722;</div><h3>Your cart is empty</h3><p>Find something you love in our shop.</p><a class="btn btn-navy" href="{% url 'catalog:list' %}">Start shopping</a></div>
+  {% endif %}
+</div>
+{% endblock %}

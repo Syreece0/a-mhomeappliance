@@ -1,0 +1,11 @@
+{% extends "dashboard/base_dash.html" %}
+{% load am_tags %}
+{% block dtitle %}Customers{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">Customers</h1>
+<form class="row mb" method="get"><input class="form-control" style="max-width:340px" name="q" value="{{ q }}" placeholder="Name, email or phone" aria-label="Search customers"><button class="btn btn-navy">Search</button></form>
+<div class="table-wrap"><table class="table"><thead><tr><th>Customer</th><th>Phone</th><th>Orders</th><th>Wallet</th><th>Joined</th><th></th></tr></thead><tbody>
+{% for c in page.object_list %}<tr><td><strong>{{ c.get_full_name|default:"-" }}</strong><div class="small muted">{{ c.email }}</div>{% if not c.is_active %}<span class="tag red">Suspended</span>{% endif %}</td><td>{{ c.phone }}</td><td>{{ c.order_count }}</td><td>{{ c.wallet.balance|naira }}</td><td>{{ c.date_joined|date:"j M Y" }}</td><td><a class="btn btn-sm btn-ghost" href="{% url 'dashboard:customer_detail' c.pk %}">View</a></td></tr>
+{% empty %}<tr><td colspan="6" class="muted center">No customers found.</td></tr>{% endfor %}</tbody></table></div>
+{% include "dashboard/_pager.html" %}
+{% endblock %}

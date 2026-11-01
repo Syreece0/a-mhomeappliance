@@ -1,0 +1,20 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}{% if product %}Edit product{% else %}New product{% endif %}{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">{% if product %}Edit: {{ product.name }}{% else %}Add product{% endif %}</h1><a class="btn btn-ghost" href="{% url 'dashboard:product_list' %}">&larr; Back</a></div>
+<form method="post" enctype="multipart/form-data" class="card stack">{% csrf_token %}
+  {% include "dashboard/_fields.html" %}
+  <div><button class="btn btn-navy" type="submit">Save product</button></div>
+</form>
+{% if product %}
+<div class="card mt"><h3>Images</h3>
+  <div class="thumb-row">{% for img in product.images.all %}<figure><img src="{{ img.image.url }}" alt="{{ img.alt_text }}">
+    <div class="row" style="margin-top:6px">{% if img.is_primary %}<span class="tag gold">Primary</span>{% else %}<form method="post" action="{% url 'dashboard:product_image' product.pk img.pk %}">{% csrf_token %}<input type="hidden" name="action" value="primary"><button class="btn btn-sm btn-ghost">Make primary</button></form>{% endif %}
+    <form method="post" action="{% url 'dashboard:product_image' product.pk img.pk %}">{% csrf_token %}<input type="hidden" name="action" value="delete"><button class="btn btn-sm btn-ghost" data-confirm="Delete this image?">&#128465;</button></form></div></figure>{% empty %}<p class="muted">No images yet &mdash; upload some using the form above.</p>{% endfor %}</div>
+</div>
+<div class="card mt"><h3>Stock: {{ product.stock }} units</h3>
+  <form method="post" action="{% url 'dashboard:product_stock' product.pk %}" class="row">{% csrf_token %}
+    {{ stock_form.mode }}{{ stock_form.quantity }}{{ stock_form.note }}<button class="btn btn-gold">Update stock</button>
+    <a class="btn btn-ghost" href="{% url 'dashboard:inventory_log' %}?product={{ product.pk }}">History</a></form>
+</div>{% endif %}
+{% endblock %}

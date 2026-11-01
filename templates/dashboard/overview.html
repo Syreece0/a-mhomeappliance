@@ -1,0 +1,31 @@
+{% extends "dashboard/base_dash.html" %}
+{% load am_tags %}
+{% block dtitle %}Overview{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">Business overview</h1>
+{% if attention %}<a class="msg warning" style="display:block;margin-bottom:16px" href="{% url 'dashboard:order_list' %}?attention=1"><strong>{{ attention }} order{{ attention|pluralize }} need your attention</strong> &mdash; payment, stock or refund follow-up. Review now &rarr;</a>{% endif %}
+<div class="stat-grid">
+  <div class="stat gold"><small>Revenue (paid orders)</small><b>{{ revenue|naira }}</b></div>
+  <div class="stat"><small>Total orders</small><b>{{ orders }}</b></div>
+  <div class="stat"><small>Customers</small><b>{{ customers }}</b></div>
+  <div class="stat"><small>Products</small><b>{{ products }}</b></div>
+  <div class="stat"><small>Pending orders</small><b>{{ pending_orders }}</b></div>
+  <div class="stat"><small>Completed (delivered)</small><b>{{ completed_orders }}</b></div>
+  <div class="stat"><small>Cancelled orders</small><b>{{ cancelled_orders }}</b></div>
+  <div class="stat"><small>Units in stock</small><b>{{ inventory_units }}</b></div>
+  <div class="stat"><small>Low-stock products</small><b>{{ low_stock_count }}</b></div>
+  <div class="stat"><small>Successful transactions</small><b>{{ ok_txns }}</b></div>
+  <div class="stat"><small>Failed transactions</small><b>{{ failed_txns }}</b></div>
+  <div class="stat"><small>Referral rewards issued</small><b>{{ rewards_issued|naira }}</b></div>
+  <div class="stat"><small>Wallet liabilities</small><b>{{ wallet_liability|naira }}</b></div>
+  <div class="stat"><small>Emails sent / failed / queued</small><b style="font-size:1.3rem">{{ emails.sent }} / {{ emails.failed }} / {{ emails.queued }}</b></div>
+  <div class="stat"><small>Campaigns sent</small><b>{{ campaigns_sent }}</b></div>
+</div>
+<div class="card mt"><h3>Revenue &mdash; last 14 days</h3>
+  <div class="bars" role="img" aria-label="Revenue per day for the last 14 days">{% for c in chart %}<div class="bar" style="height:{{ c.pct }}%" title="{{ c.label }}: &#8358;{{ c.total|floatformat:0 }} ({{ c.orders }} order{{ c.orders|pluralize }})"><span>{{ c.label }}</span></div>{% endfor %}</div><div style="height:26px"></div>
+</div>
+<div class="form-grid mt">
+  <div class="card"><h3>Low stock</h3>{% for p in low_stock %}<div class="row between" style="padding:6px 0"><a href="{% url 'dashboard:product_edit' p.pk %}">{{ p.name }}</a><span class="status {% if p.stock == 0 %}cancelled{% else %}pending{% endif %}">{{ p.stock }} left</span></div>{% empty %}<p class="muted">Nothing is running low.</p>{% endfor %}</div>
+  <div class="card"><h3>Recent orders</h3>{% for o in recent_orders %}<div class="row between" style="padding:6px 0"><a href="{% url 'dashboard:order_detail' o.number %}">{{ o.number }}</a><span>{{ o.total|naira }}</span><span class="status {{ o.status }}">{{ o.get_status_display }}</span></div>{% empty %}<p class="muted">No orders yet.</p>{% endfor %}</div>
+</div>
+{% endblock %}

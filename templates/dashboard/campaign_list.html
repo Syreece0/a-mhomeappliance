@@ -1,0 +1,17 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Email campaigns{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">Email campaigns</h1><a class="btn btn-gold" href="{% url 'dashboard:campaign_new' %}">+ New campaign</a></div>
+<div class="stat-grid mb"><div class="stat"><small>Newsletter subscribers</small><b>{{ subscribers }}</b></div><div class="stat"><small>Opted-in customers</small><b>{{ opted_in }}</b></div><div class="stat"><small>Failed deliveries</small><b>{{ failed_count }}</b></div></div>
+<div class="table-wrap"><table class="table"><thead><tr><th>Campaign</th><th>Audience</th><th>Status</th><th>Delivery</th><th></th></tr></thead><tbody>
+{% for c in campaigns %}<tr><td><strong>{{ c.name }}</strong><div class="small muted">{{ c.subject }}</div></td><td class="small">{{ c.get_audience_display }}</td>
+  <td><span class="status {{ c.status }}">{{ c.get_status_display }}</span>{% if c.status == "scheduled" %}<div class="small muted">{{ c.scheduled_for|date:"j M Y H:i" }}</div>{% endif %}{% if c.sent_at %}<div class="small muted">{{ c.sent_at|date:"j M H:i" }}</div>{% endif %}</td>
+  <td class="small">{% if c.status == "sent" or c.status == "sending" %}Queued {{ c.recipients_count }} &middot; Sent {{ c.stats.sent }} &middot; Failed {{ c.stats.failed }} &middot; Skipped {{ c.stats.skipped }}{% else %}-{% endif %}</td>
+  <td><div class="row"><a class="btn btn-sm btn-ghost" target="_blank" href="{% url 'dashboard:campaign_preview' c.pk %}">Preview</a>
+    {% if c.status == "draft" or c.status == "scheduled" %}<a class="btn btn-sm btn-ghost" href="{% url 'dashboard:campaign_edit' c.pk %}">Edit</a>
+    <form method="post" action="{% url 'dashboard:campaign_action' c.pk %}">{% csrf_token %}<input type="hidden" name="action" value="test"><button class="btn btn-sm btn-ghost">Send test to me</button></form>
+    <form method="post" action="{% url 'dashboard:campaign_action' c.pk %}">{% csrf_token %}<input type="hidden" name="action" value="send"><button class="btn btn-sm btn-navy" data-confirm="Send this campaign to all eligible recipients now?">Send now</button></form>
+    <form method="post" action="{% url 'dashboard:campaign_action' c.pk %}">{% csrf_token %}<input type="hidden" name="action" value="cancel"><button class="btn btn-sm btn-ghost">Cancel</button></form>{% endif %}</div></td></tr>
+{% empty %}<tr><td colspan="5" class="muted center">No campaigns yet.</td></tr>{% endfor %}</tbody></table></div>
+{% if failed %}<div class="card mt"><h3>Recent failed emails</h3>{% for d in failed %}<div class="row between small" style="padding:6px 0"><span>{{ d.to_email }} &mdash; {{ d.subject }}</span><span class="muted">{{ d.error|truncatechars:80 }}</span><form method="post" action="{% url 'dashboard:email_retry' d.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm btn-ghost">Retry</button></form></div>{% endfor %}</div>{% endif %}
+{% endblock %}

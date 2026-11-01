@@ -1,0 +1,14 @@
+{% extends "emails/base_email.html" %}
+{% load am_tags %}
+{% block body %}
+<h1 style="font-family:Georgia,serif;font-size:24px;margin:0 0 12px;">Your payment didn't go through</h1>
+<p>Hi {{ order.full_name }}, we couldn't complete the payment for order <strong>{{ order.number }}</strong>. No order has been confirmed and your cart is unchanged.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="font-size:14px;margin:8px 0;">
+  <tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Reference</td><td>{{ txn.reference }}</td></tr>
+  <tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Amount attempted</td><td><strong>{{ txn.amount|naira }}</strong></td></tr>
+  <tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Status</td><td>{{ txn.get_status_display }}</td></tr>
+  {% if txn.gateway_response %}<tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Reason</td><td>{{ txn.gateway_response }}</td></tr>{% endif %}
+</table>
+{% include "emails/_button.html" with url=retry_url label="Retry Payment" %}
+<p style="font-size:13px;color:#5a6b84;">If you were debited, please don't worry &mdash; we verify every payment with Paystack and will confirm your order automatically.</p>
+{% endblock %}

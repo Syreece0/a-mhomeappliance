@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ content.title }} - {{ biz.business_name }}{% endblock %}
+{% block meta_desc %}{{ content.summary|truncatechars:160 }}{% endblock %}
+{% block content %}
+{% include "core/_preview_bar.html" %}
+<section class="page-hero compact">
+  <div class="container">
+    <span class="eyebrow" data-anim="left">Policies</span>
+    <h1 data-anim="bottom">{{ content.title }}</h1>
+    {% if content.summary %}<p class="lead" data-anim="bottom" style="--d:120ms">{{ content.summary }}</p>{% endif %}
+    {% if updated %}<p class="small updated">Last updated: <time datetime="{{ updated|date:'Y-m-d' }}">{{ updated|date:"j F Y" }}</time></p>{% endif %}
+  </div>
+</section>
+<div class="container policy-layout">
+  <aside class="policy-side" aria-label="Policies">
+    <nav class="card policy-nav"><h4>Policies</h4>
+      <ul>{% for p in policies %}<li><a href="{{ p.url }}" class="{% if p.slug == page.slug %}active{% endif %}" {% if p.slug == page.slug %}aria-current="page"{% endif %}>{{ p.title }}</a></li>{% endfor %}
+      <li><a href="{% url 'core:about' %}">About us</a></li><li><a href="{% url 'core:contact' %}">Contact us</a></li></ul>
+    </nav>
+    {% if content.sections|length > 1 %}
+    <nav class="card policy-toc"><h4>On this page</h4>
+      <ol>{% for s in content.sections %}<li><a href="#{{ s.anchor }}">{{ s.title }}</a></li>{% endfor %}</ol>
+    </nav>{% endif %}
+  </aside>
+  <article class="policy-article">
+    {% for s in content.sections %}
+    <section class="doc-section" id="{{ s.anchor }}" data-anim="bottom">
+      <h2><span class="num">{{ forloop.counter }}</span>{{ s.title }}</h2>
+      {% if s.image_url %}<img class="doc-img" src="{{ s.image_url }}" alt="" loading="lazy">{% endif %}
+      <div class="prose">{{ s.body|safe }}</div>
+    </section>
+    {% empty %}<p class="muted">This policy has no content yet.</p>{% endfor %}
+    <p class="small muted">Questions about this policy? <a href="{% url 'core:contact' %}" style="color:var(--gold-ink);font-weight:800">Contact us</a>.</p>
+  </article>
+</div>
+{% endblock %}

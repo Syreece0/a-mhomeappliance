@@ -1,0 +1,11 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Promotions{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">Promotions</h1><a class="btn btn-gold" href="{% url 'dashboard:promotion_new' %}">+ New promotion</a></div>
+<p class="muted">Schedule a percentage discount for chosen products. Prices change automatically at the start time and revert at the end time.</p>
+<div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Discount</th><th>Products</th><th>Runs</th><th>State</th><th></th></tr></thead><tbody>
+{% for p in promotions %}<tr><td><strong>{{ p.name }}</strong></td><td>{{ p.discount_percent }}%</td><td>{{ p.items.all|length }}</td><td class="small">{{ p.starts_at|date:"j M Y H:i" }} &rarr; {{ p.ends_at|date:"j M Y H:i" }}</td>
+  <td>{% if p.applied %}<span class="status paid">Live</span>{% elif not p.is_active %}<span class="status">Disabled</span>{% else %}<span class="status pending">Scheduled / ended</span>{% endif %}</td>
+  <td><div class="row"><a class="btn btn-sm btn-ghost" href="{% url 'dashboard:promotion_edit' p.pk %}">Edit</a><form method="post" action="{% url 'dashboard:promotion_delete' p.pk %}">{% csrf_token %}<button class="btn btn-sm btn-ghost" data-confirm="Delete this promotion? Prices will be restored.">Delete</button></form></div></td></tr>
+{% empty %}<tr><td colspan="6" class="muted center">No promotions yet.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

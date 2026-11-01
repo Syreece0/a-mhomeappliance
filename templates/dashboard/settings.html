@@ -1,0 +1,7 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Settings{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">Business settings</h1>
+<form method="post" enctype="multipart/form-data" class="card stack" style="max-width:900px">{% csrf_token %}{% include "dashboard/_fields.html" %}
+  <div><button class="btn btn-navy">Save settings</button></div></form>
+{% endblock %}

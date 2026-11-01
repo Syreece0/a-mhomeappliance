@@ -1,0 +1,9 @@
+{% extends "emails/base_email.html" %}
+{% load am_tags %}
+{% block body %}
+<h1 style="font-family:Georgia,serif;font-size:24px;margin:0 0 12px;">We received your order</h1>
+<p>Hi {{ order.full_name }}, thanks for shopping with us. Your order <strong>{{ order.number }}</strong> is waiting for payment.</p>
+{% include "emails/_lines.html" %}
+<p style="text-align:right;margin:0;">Subtotal: {{ order.subtotal|naira }}<br>Delivery: {% if order.delivery_fee %}{{ order.delivery_fee|naira }}{% else %}Free{% endif %}{% if order.wallet_amount %}<br>Referral wallet: -{{ order.wallet_amount|naira }}{% endif %}<br><strong style="font-size:17px;">To pay: {{ order.amount_payable|naira }}</strong></p>
+{% include "emails/_button.html" with url=pay_url label="Complete Payment" %}
+{% endblock %}

@@ -1,0 +1,6 @@
+{% load am_tags %}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e1e6ef;margin:14px 0;">
+{% for l in lines %}<tr>
+  <td width="64" style="padding:12px 0;border-bottom:1px solid #e1e6ef;">{% if l.image %}<img src="{{ l.image }}" alt="" width="56" height="56" style="display:block;width:56px;height:56px;object-fit:contain;border-radius:8px;background:#f4f6fb;">{% endif %}</td>
+  <td style="padding:12px 8px;border-bottom:1px solid #e1e6ef;font-size:14px;"><strong>{{ l.name }}</strong><br><span style="color:#5a6b84;">Qty {{ l.quantity }} &times; {{ l.unit_price|naira }}</span></td>
+  <td align="right" style="padding:12px 0;border-bottom:1px solid #e1e6ef;font-size:14px;font-weight:bold;">{% if l.line_total %}{{ l.line_total|naira }}{% else %}{{ l.unit_price|naira }}{% endif %}</td>
+</tr>{% endfor %}</table>

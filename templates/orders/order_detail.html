@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}Order {{ order.number }} - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding-bottom:64px">
+  <div class="row between" style="padding-top:28px"><h1 style="font-size:clamp(1.5rem,3vw,2.1rem);margin:0">Order {{ order.number }}</h1><span class="status {{ order.status }}">{{ order.get_status_display }}</span></div>
+  <p class="muted">Placed {{ order.created_at|date:"j M Y, g:i A" }}</p>
+
+  {% if order.status == "cancelled" or order.status == "refunded" %}
+    <div class="msg warning">This order is {{ order.get_status_display|lower }}.</div>
+  {% elif order.paid_at %}
+    <div class="tracker" aria-label="Order progress">
+      {% for key, label in steps %}<div class="step {% if forloop.counter0 <= order.progress_index %}done{% endif %}"><div class="dot">{% if forloop.counter0 <= order.progress_index %}&#10003;{% endif %}</div>{{ label }}</div>{% endfor %}
+    </div>
+  {% endif %}
+
+  {% if order.awaiting_payment %}
+  <div class="card row between" style="border-color:var(--gold)">
+    <div><strong>Payment not completed</strong><p class="muted small" style="margin:0">Amount due: <b>{{ order.amount_payable|naira }}</b>. Your items are not reserved until payment is confirmed.</p></div>
+    <div class="row">
+      <form method="post" action="{% url 'payments:pay' order.number %}">{% csrf_token %}<button class="btn btn-gold">Pay / retry payment</button></form>
+      <form method="post" action="{% url 'payments:recheck' order.number %}">{% csrf_token %}<button class="btn btn-ghost">Check payment status</button></form>
+      <form method="post" action="{% url 'orders:cancel' order.number %}">{% csrf_token %}<button class="btn btn-ghost" data-confirm="Cancel this order?">Cancel order</button></form>
+    </div>
+  </div>{% endif %}
+
+  <div class="cart-layout" style="padding-top:24px">
+    <section class="card">
+      <h3>Items</h3>
+      {% for i in order.items.all %}<div class="row between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span>{{ i.quantity }} &times; {% if i.product %}<a href="{{ i.product.get_absolute_url }}">{{ i.name }}</a>{% else %}{{ i.name }}{% endif %}</span><strong>{{ i.line_total|naira }}</strong></div>{% endfor %}
+      <h3 class="mt">Delivery</h3>
+      <p>{{ order.full_name }}<br>{{ order.address }}<br>{{ order.city }}, {{ order.state }}<br>{{ order.phone }}</p>
+      {% if order.notes %}<p class="muted small">Note: {{ order.notes }}</p>{% endif %}
+      {% if order.tracking_number or order.carrier or order.delivery_estimate %}<p class="small"><b>Shipping:</b> {{ order.carrier }} {% if order.tracking_number %}&middot; Tracking {{ order.tracking_number }}{% endif %} {% if order.delivery_estimate %}&middot; {{ order.delivery_estimate }}{% endif %}</p>{% endif %}
+      <h3 class="mt">History</h3>
+      <ul class="small" style="padding-left:18px">{% for h in order.history.all %}<li>{{ h.created_at|date:"j M, H:i" }} &mdash; <b>{{ h.get_status_display }}</b>{% if h.note %} ({{ h.note }}){% endif %}</li>{% endfor %}</ul>
+    </section>
+    <aside class="card summary">
+      <h3>Payment summary</h3>
+      <div class="sum-row"><span>Subtotal</span><span>{{ order.subtotal|naira }}</span></div>
+      <div class="sum-row"><span>Delivery</span><span>{% if order.delivery_fee %}{{ order.delivery_fee|naira }}{% else %}Free{% endif %}</span></div>
+      {% if order.wallet_amount %}<div class="sum-row"><span>Referral wallet</span><span>-{{ order.wallet_amount|naira }}</span></div>{% endif %}
+      <div class="sum-row sum-total"><span>{% if order.paid_at %}Paid via Paystack{% else %}To pay{% endif %}</span><span>{{ order.amount_payable|naira }}</span></div>
+      {% for t in order.transactions.all %}<p class="small muted" style="margin:6px 0 0">Ref {{ t.reference }} &middot; <span class="status {{ t.status }}">{{ t.get_status_display }}</span></p>{% endfor %}
+      {% if biz.whatsapp_digits %}<a class="btn btn-wa btn-block mt" target="_blank" rel="noopener" href="{% whatsapp_url biz.whatsapp_digits wa_text %}">&#128172; Ask about this order</a>{% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

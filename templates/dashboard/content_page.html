@@ -1,0 +1,46 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Edit {{ page.title }}{% endblock %}
+{% block dash %}
+<p class="small"><a href="{% url 'dashboard:content_home' %}" style="color:var(--gold-ink);font-weight:800">&larr; Website content</a></p>
+<div class="row between">
+  <h1 style="font-size:2rem;margin:0">{{ page.title }}</h1>
+  <span class="status {% if page.has_unpublished_changes %}pending{% else %}paid{% endif %}">{{ page.status_label }}</span>
+</div>
+<p class="muted small">Last edited {{ page.draft_updated_at|date:"j M Y, H:i" }}{% if page.updated_by %} by {{ page.updated_by.display_name }}{% endif %}.
+  {% if page.published_at %}Last published {{ page.published_at|date:"j M Y, H:i" }}.{% else %}Not published yet.{% endif %}</p>
+
+<form method="post" enctype="multipart/form-data" class="card stack mb" style="max-width:900px">{% csrf_token %}
+  <h2 style="font-size:1.2rem">Page details</h2>
+  {% include "dashboard/_fields.html" %}
+  <div class="row">
+    <button class="btn btn-ghost" name="action" value="save">Save draft</button>
+    <a class="btn btn-ghost" href="{% url 'dashboard:content_preview' page.slug %}" target="_blank" rel="noopener">Preview</a>
+    <button class="btn btn-gold" name="action" value="publish" data-confirm="Publish this page? The current draft will go live on the website.">Publish</button>
+    {% if page.is_published and page.has_unpublished_changes %}<button class="btn btn-ghost" name="action" value="discard" formnovalidate data-confirm="Discard all unpublished changes and go back to the live version?">Discard unpublished changes</button>{% endif %}
+  </div>
+</form>
+
+<div class="card mb" style="max-width:900px">
+  <div class="row between"><h2 style="font-size:1.2rem;margin:0">Sections</h2><a class="btn btn-sm btn-navy" href="{% url 'dashboard:content_section_new' page.slug %}">+ Add section</a></div>
+  <p class="muted small">Edit, hide, reorder or remove sections. Changes here are part of the draft until you publish.</p>
+  <ol class="sec-list">
+    {% for s in sections %}
+    <li class="sec-item {% if not s.is_active %}is-hidden{% endif %}">
+      <div class="sec-main"><strong>{{ s.title }}</strong>{% if not s.is_active %} <span class="status">Hidden</span>{% endif %}{% if s.image %} <span class="status">Image</span>{% endif %}</div>
+      <div class="row">
+        <form method="post" action="{% url 'dashboard:content_section_move' page.slug s.pk %}">{% csrf_token %}<input type="hidden" name="direction" value="up"><button class="btn btn-sm btn-ghost" aria-label="Move {{ s.title }} up" {% if forloop.first %}disabled{% endif %}>&uarr;</button></form>
+        <form method="post" action="{% url 'dashboard:content_section_move' page.slug s.pk %}">{% csrf_token %}<input type="hidden" name="direction" value="down"><button class="btn btn-sm btn-ghost" aria-label="Move {{ s.title }} down" {% if forloop.last %}disabled{% endif %}>&darr;</button></form>
+        <a class="btn btn-sm btn-navy" href="{% url 'dashboard:content_section_edit' page.slug s.pk %}">Edit</a>
+        <form method="post" action="{% url 'dashboard:content_section_delete' page.slug s.pk %}">{% csrf_token %}<button class="btn btn-sm btn-ghost" data-confirm="Remove this section from the draft?">Remove</button></form>
+      </div>
+    </li>
+    {% empty %}<li class="muted">No sections yet. Add the first one.</li>{% endfor %}
+  </ol>
+</div>
+
+<div class="card" style="max-width:900px">
+  <h2 style="font-size:1.2rem">Change history</h2>
+  <ul class="history">{% for r in revisions %}<li><strong>{{ r.get_action_display }}</strong>{% if r.note and r.note != "Published" %} &mdash; {{ r.note }}{% endif %} <span class="muted small">{{ r.created_at|date:"j M Y, H:i" }}{% if r.user %} &middot; {{ r.user.display_name }}{% endif %}</span></li>
+  {% empty %}<li class="muted">No changes recorded yet.</li>{% endfor %}</ul>
+</div>
+{% endblock %}

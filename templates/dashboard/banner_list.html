@@ -1,0 +1,9 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Banners{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">Banners</h1><a class="btn btn-gold" href="{% url 'dashboard:banner_new' %}">+ Add banner</a></div>
+<div class="table-wrap"><table class="table"><thead><tr><th>Banner</th><th>Type</th><th>Order</th><th>Schedule</th><th>Status</th><th></th></tr></thead><tbody>
+{% for b in banners %}<tr><td><div class="row" style="flex-wrap:nowrap">{% if b.image %}<img src="{{ b.image.url }}" alt="" style="width:80px;height:46px;object-fit:cover;border-radius:6px">{% endif %}<strong>{{ b.title }}</strong></div></td><td>{{ b.get_kind_display }}</td><td>{{ b.position }}</td><td class="small">{% if b.starts_at %}{{ b.starts_at|date:"j M H:i" }}{% else %}now{% endif %} &rarr; {% if b.ends_at %}{{ b.ends_at|date:"j M H:i" }}{% else %}no end{% endif %}</td><td>{% if b.is_active %}<span class="status paid">Active</span>{% else %}<span class="status">Off</span>{% endif %}</td>
+<td><div class="row"><a class="btn btn-sm btn-ghost" href="{% url 'dashboard:banner_edit' b.pk %}">Edit</a><form method="post" action="{% url 'dashboard:banner_delete' b.pk %}">{% csrf_token %}<button class="btn btn-sm btn-ghost" data-confirm="Delete this banner?">Delete</button></form></div></td></tr>
+{% empty %}<tr><td colspan="6" class="muted center">No banners. The homepage shows a default hero until you add some.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

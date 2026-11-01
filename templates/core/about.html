@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ content.title }} - {{ biz.business_name }}{% endblock %}
+{% block meta_desc %}{{ content.summary|truncatechars:160 }}{% endblock %}
+{% block content %}
+{% include "core/_preview_bar.html" %}
+<section class="page-hero">
+  {% if content.hero_url %}<img class="ph-bg" src="{{ content.hero_url }}" alt="" fetchpriority="high">{% endif %}
+  <div class="container">
+    <span class="eyebrow" data-anim="left">About us</span>
+    <h1 data-anim="bottom">{{ content.title }}</h1>
+    {% if content.summary %}<p class="lead" data-anim="bottom" style="--d:120ms">{{ content.summary }}</p>{% endif %}
+  </div>
+</section>
+<div class="container about-body">
+  {% for s in content.sections %}
+  <section class="about-section {% if s.image_url %}has-image{% endif %}" id="{{ s.anchor }}">
+    <div class="about-text" data-anim="{% if forloop.counter|divisibleby:2 %}right{% else %}left{% endif %}">
+      <h2>{{ s.title }}</h2>
+      <div class="prose">{{ s.body|safe }}</div>
+    </div>
+    {% if s.image_url %}<figure class="about-img" data-anim="{% if forloop.counter|divisibleby:2 %}left{% else %}right{% endif %}"><img src="{{ s.image_url }}" alt="" loading="lazy"></figure>{% endif %}
+  </section>
+  {% empty %}<p class="muted center">This page has no content yet.</p>{% endfor %}
+  <div class="cta-band" data-anim="scale">
+    <div><h2>Ready to find the right appliance?</h2><p>Browse our range or talk to our team &mdash; we are happy to help.</p></div>
+    <div class="row"><a class="btn btn-gold" href="{% url 'catalog:list' %}">Shop now</a><a class="btn btn-ghost-light" href="{% url 'core:contact' %}">Contact us</a></div>
+  </div>
+</div>
+{% endblock %}

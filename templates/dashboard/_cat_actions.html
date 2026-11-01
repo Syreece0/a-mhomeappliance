@@ -1,0 +1,4 @@
+<form method="post" action="{% url 'dashboard:category_move' c.pk %}">{% csrf_token %}<input type="hidden" name="direction" value="up"><button class="btn btn-sm btn-ghost" aria-label="Move {{ c.name }} up">&uarr;</button></form>
+<form method="post" action="{% url 'dashboard:category_move' c.pk %}">{% csrf_token %}<input type="hidden" name="direction" value="down"><button class="btn btn-sm btn-ghost" aria-label="Move {{ c.name }} down">&darr;</button></form>
+<a class="btn btn-sm btn-ghost" href="{% url 'dashboard:category_edit' c.pk %}">Edit</a>
+<form method="post" action="{% url 'dashboard:category_delete' c.pk %}">{% csrf_token %}<button class="btn btn-sm btn-ghost" data-confirm="Delete {{ c.name }}{% if not c.parent_id %} and its subcategories{% endif %}? Products stay but become uncategorised.">Delete</button></form>

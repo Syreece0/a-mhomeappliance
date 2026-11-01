@@ -1,0 +1,13 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Categories{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">Categories</h1><a class="btn btn-gold" href="{% url 'dashboard:category_new' %}">+ Add category</a></div>
+{% if not categories %}<div class="card"><p>No categories yet. Load the standard A&amp;M set with <code>python manage.py seed_categories</code>, or add your own.</p></div>{% endif %}
+{% for c in categories %}
+<div class="card mb" style="padding:16px 20px">
+  <div class="row between"><div><strong style="font-size:1.1rem">{{ c.name }}</strong> {% if not c.is_active %}<span class="tag red">Hidden</span>{% endif %}</div>
+    <div class="row">{% include "dashboard/_cat_actions.html" with c=c %}</div></div>
+  {% if c.children.all %}<div style="margin:10px 0 0 18px;border-left:3px solid var(--gold);padding-left:14px">
+    {% for ch in c.children.all %}<div class="row between" style="padding:5px 0"><span>{{ ch.name }} {% if not ch.is_active %}<span class="tag red">Hidden</span>{% endif %}</span><div class="row">{% include "dashboard/_cat_actions.html" with c=ch %}</div></div>{% endfor %}</div>{% endif %}
+</div>{% endfor %}
+{% endblock %}

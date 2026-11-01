@@ -1,0 +1,9 @@
+{% extends "emails/base_email.html" %}
+{% block title %}Welcome to {{ biz.business_name }}{% endblock %}
+{% block body %}
+<h1 style="font-family:Georgia,serif;font-size:26px;margin:0 0 14px;">Welcome, {{ user.display_name }}!</h1>
+<p>Thank you for joining <strong>{{ biz.business_name }}</strong>. We bring you dependable home appliances for every room &mdash; kitchen, laundry, cooling, entertainment and more &mdash; with genuine warranty and reliable delivery.</p>
+<p>Your account is ready. You can track orders, save favourites to your wishlist, and earn store credit when friends you refer make their first purchase.</p>
+{% include "emails/_button.html" with url=shop_url label="Shop Now" %}
+<p style="font-size:13px;color:#5a6b84;">Visit us anytime at <a href="{{ site_url }}" style="color:#6b5214;">{{ site_url }}</a>.</p>
+{% endblock %}

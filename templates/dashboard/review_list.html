@@ -1,0 +1,13 @@
+{% extends "dashboard/base_dash.html" %}
+{% load am_tags %}
+{% block dtitle %}Reviews{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">Review moderation</h1><a class="btn btn-ghost" href="?filter={% if filter == 'all' %}{% else %}all{% endif %}">{% if filter == 'all' %}Show pending only{% else %}Show all{% endif %}</a></div>
+{% for r in page.object_list %}
+<div class="card mb"><div class="row between"><div><span class="stars">{{ r.rating|stars }}</span> <strong>{{ r.title }}</strong><div class="small muted">{{ r.user.email }} on <a href="{{ r.product.get_absolute_url }}">{{ r.product.name }}</a> &middot; {{ r.created_at|date:"j M Y" }}{% if r.is_verified_purchase %} &middot; Verified purchase{% endif %}</div></div>
+  <div class="row">{% if not r.is_approved %}<form method="post" action="{% url 'dashboard:review_action' r.pk %}">{% csrf_token %}<input type="hidden" name="action" value="approve"><input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm btn-navy">Approve</button></form>{% else %}<span class="status paid">Published</span>{% endif %}
+    <form method="post" action="{% url 'dashboard:review_action' r.pk %}">{% csrf_token %}<input type="hidden" name="action" value="reject"><input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm btn-ghost" data-confirm="Delete this review?">Delete</button></form></div></div>
+  <p style="margin:8px 0 0">{{ r.body }}</p></div>
+{% empty %}<div class="empty"><p>No reviews to moderate.</p></div>{% endfor %}
+{% include "dashboard/_pager.html" %}
+{% endblock %}

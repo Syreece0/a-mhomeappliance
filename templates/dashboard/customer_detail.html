@@ -1,0 +1,19 @@
+{% extends "dashboard/base_dash.html" %}
+{% load am_tags %}
+{% block dtitle %}{{ customer.email }}{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">{{ customer.get_full_name|default:customer.email }}</h1>
+  <form method="post" action="{% url 'dashboard:customer_toggle' customer.pk %}">{% csrf_token %}<button class="btn btn-ghost" data-confirm="{% if customer.is_active %}Suspend{% else %}Reactivate{% endif %} this account?">{% if customer.is_active %}Suspend account{% else %}Reactivate account{% endif %}</button></form></div>
+<div class="stat-grid mb"><div class="stat gold"><small>Wallet balance</small><b>{{ customer.wallet.balance|naira }}</b></div><div class="stat"><small>Referral code</small><b>{{ customer.referral_code.code }}</b></div><div class="stat"><small>Total earned</small><b>{{ customer.wallet.total_earned|naira }}</b></div><div class="stat"><small>Total spent</small><b>{{ customer.wallet.total_spent|naira }}</b></div></div>
+<div class="form-grid" style="align-items:start">
+  <div class="card"><h3>Profile</h3><p>{{ customer.email }}<br>{{ customer.phone|default:"No phone" }}<br>{{ customer.address }} {{ customer.city }} {{ customer.state }}</p><p class="small muted">Joined {{ customer.date_joined|date:"j M Y" }} &middot; Promotional emails: {% if customer.marketing_opt_in %}opted in{% else %}not opted in{% endif %}</p>
+    {% if referred_by %}<p class="small">Referred by <a href="{% url 'dashboard:customer_detail' referred_by.referrer_id %}">{{ referred_by.referrer.email }}</a> &mdash; <span class="status {{ referred_by.status }}">{{ referred_by.get_status_display }}</span></p>{% endif %}</div>
+  <div class="card stack"><h3>Adjust wallet</h3>
+    <form method="post" action="{% url 'dashboard:wallet_adjust' customer.pk %}" class="stack">{% csrf_token %}
+      <div class="field"><label>Amount (&#8358;, negative to deduct)</label>{{ adjust_form.amount }}</div><div class="field"><label>Reason (recorded in audit trail)</label>{{ adjust_form.reason }}</div>
+      <button class="btn btn-navy" data-confirm="Apply this wallet adjustment?">Apply adjustment</button></form></div>
+</div>
+<div class="card mt"><h3>Orders</h3>{% for o in orders %}<div class="row between" style="padding:6px 0"><a href="{% url 'dashboard:order_detail' o.number %}">{{ o.number }}</a><span>{{ o.total|naira }}</span><span class="status {{ o.status }}">{{ o.get_status_display }}</span><span class="muted small">{{ o.created_at|date:"j M Y" }}</span></div>{% empty %}<p class="muted">No orders.</p>{% endfor %}</div>
+<div class="card mt"><h3>People referred</h3>{% for r in referrals %}<div class="row between" style="padding:6px 0"><a href="{% url 'dashboard:customer_detail' r.referred_id %}">{{ r.referred.email }}</a><span class="status {{ r.status }}">{{ r.get_status_display }}</span><span>{{ r.reward_amount|naira }}</span></div>{% empty %}<p class="muted">None yet.</p>{% endfor %}</div>
+<div class="card mt"><h3>Wallet history</h3>{% for t in wallet_txns %}<div class="row between small" style="padding:6px 0"><span>{{ t.created_at|date:"j M Y, H:i" }}</span><span>{{ t.get_kind_display }}{% if t.note %} &mdash; {{ t.note }}{% endif %}{% if t.created_by %} (by {{ t.created_by.email }}){% endif %}</span><strong style="color:{% if t.amount > 0 %}var(--ok){% else %}var(--danger){% endif %}">{{ t.amount|naira }}</strong><span class="muted">Bal {{ t.balance_after|naira }}</span></div>{% empty %}<p class="muted">No wallet activity.</p>{% endfor %}</div>
+{% endblock %}

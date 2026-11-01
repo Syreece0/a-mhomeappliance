@@ -1,0 +1,10 @@
+{% extends "emails/base_email.html" %}
+{% load am_tags %}
+{% block body %}
+<h1 style="font-family:Georgia,serif;font-size:24px;margin:0 0 12px;">{{ headline }}</h1>
+<p>Hi {{ order.full_name }}, {{ message }} (Order <strong>{{ order.number }}</strong>)</p>
+{% if order.status == "shipped" %}<p>{% if order.carrier %}Carrier: <strong>{{ order.carrier }}</strong><br>{% endif %}{% if order.tracking_number %}Tracking number: <strong>{{ order.tracking_number }}</strong><br>{% endif %}{% if order.delivery_estimate %}Estimated delivery: <strong>{{ order.delivery_estimate }}</strong>{% endif %}</p>{% endif %}
+{% if order.status == "refunded" %}<p>Refund amount: <strong>{{ order.total|naira }}</strong>{% if order.wallet_amount %} (referral wallet credit of {{ order.wallet_amount|naira }} returns to your wallet){% endif %}. Card refunds can take a few business days to reach your bank.</p>{% endif %}
+{% include "emails/_lines.html" %}
+{% include "emails/_button.html" with url=order_url label="View Order" %}
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "emails/base_email.html" %}
+{% load am_tags %}
+{% block body %}
+<h1 style="font-family:Georgia,serif;font-size:24px;margin:0 0 12px;">You earned {{ amount|naira }}!</h1>
+<p>Hi {{ user.display_name }}, {{ friend }} just completed their first purchase, so we've added <strong>{{ amount|naira }}</strong> to your referral wallet.</p>
+<p>Use it as store credit on your next order &mdash; it can be combined with Paystack if the total is higher than your balance.</p>
+{% include "emails/_button.html" with url=wallet_url label="View My Wallet" %}
+{% endblock %}

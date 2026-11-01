@@ -1,0 +1,8 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Promotion{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">{% if promo %}Edit promotion{% else %}New promotion{% endif %}</h1>
+<form method="post" class="card stack" style="max-width:820px">{% csrf_token %}{% include "dashboard/_fields.html" %}
+  <p class="help">Hold Ctrl (Cmd on Mac) to select several products. A product already in another live promotion is not discounted twice.</p>
+  <div class="row"><button class="btn btn-navy">Save promotion</button><a class="btn btn-ghost" href="{% url 'dashboard:promotion_list' %}">Cancel</a></div></form>
+{% endblock %}

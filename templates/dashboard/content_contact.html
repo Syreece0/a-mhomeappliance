@@ -1,0 +1,11 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Contact information{% endblock %}
+{% block dash %}
+<p class="small"><a href="{% url 'dashboard:content_home' %}" style="color:var(--gold-ink);font-weight:800">&larr; Website content</a></p>
+<h1 style="font-size:2rem">Contact information</h1>
+<p class="muted" style="max-width:70ch">These details are used on the Contact Us page, in the footer, in emails and inside the policies. Saving publishes them immediately.</p>
+<form method="post" class="card stack" style="max-width:900px">{% csrf_token %}
+  {% include "dashboard/_fields.html" %}
+  <div class="row"><button class="btn btn-navy">Save contact information</button><a class="btn btn-ghost" href="{% url 'core:contact' %}" target="_blank" rel="noopener">View Contact Us page</a></div>
+</form>
+{% endblock %}

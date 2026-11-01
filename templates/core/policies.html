@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Policies - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<section class="page-hero compact"><div class="container">
+  <span class="eyebrow" data-anim="left">Privacy &amp; policies</span>
+  <h1 data-anim="bottom">Our policies</h1>
+  <p class="lead" data-anim="bottom" style="--d:120ms">Clear rules for how we handle your information, orders, payments and rewards.</p>
+</div></section>
+<div class="container section">
+  <div class="policy-cards" data-anim-group="0">
+    {% for p in policies %}
+    <a class="card policy-card" href="{{ p.url }}" data-anim="auto">
+      <h3>{{ p.title }}</h3><p class="muted">{{ p.summary }}</p>
+      <span class="small muted">Updated {{ p.updated|date:"j F Y" }}</span><span class="link-arrow">Read policy &rarr;</span>
+    </a>{% endfor %}
+  </div>
+</div>
+{% endblock %}

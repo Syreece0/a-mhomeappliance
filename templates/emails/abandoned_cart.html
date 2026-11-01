@@ -1,0 +1,8 @@
+{% extends "emails/base_email.html" %}
+{% load am_tags %}
+{% block body %}
+<h1 style="font-family:Georgia,serif;font-size:24px;margin:0 0 12px;">You left something in your cart</h1>
+<p>Hi {{ user.display_name }}, the items below are still waiting for you. Stock can run out, so complete your order while they're available.</p>
+{% include "emails/_lines.html" %}
+{% include "emails/_button.html" with url=cart_url label="Return to Your Cart" %}
+{% endblock %}

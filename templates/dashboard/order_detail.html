@@ -1,0 +1,32 @@
+{% extends "dashboard/base_dash.html" %}
+{% load am_tags %}
+{% block dtitle %}Order {{ order.number }}{% endblock %}
+{% block dash %}
+<div class="row between mb"><h1 style="font-size:2rem;margin:0">Order {{ order.number }}</h1><span class="status {{ order.status }}">{{ order.get_status_display }}</span></div>
+{% if order.needs_attention %}<div class="msg warning mb"><strong>Needs attention</strong><div class="small" style="white-space:pre-line">{{ order.admin_note }}</div>
+  <form method="post" action="{% url 'dashboard:order_clear_flag' order.number %}" style="margin-top:8px">{% csrf_token %}<button class="btn btn-sm btn-ghost">Mark as resolved</button></form></div>{% endif %}
+<div class="form-grid" style="grid-template-columns:2fr 1fr;align-items:start">
+  <div class="stack">
+    <div class="card"><h3>Items</h3>{% for i in order.items.all %}<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--border)"><span>{{ i.quantity }} &times; {{ i.name }}</span><strong>{{ i.line_total|naira }}</strong></div>{% endfor %}
+      <div class="sum-row"><span>Subtotal</span><span>{{ order.subtotal|naira }}</span></div><div class="sum-row"><span>Delivery</span><span>{{ order.delivery_fee|naira }}</span></div>
+      {% if order.wallet_amount %}<div class="sum-row"><span>Referral wallet used</span><span>-{{ order.wallet_amount|naira }}</span></div>{% endif %}
+      <div class="sum-row sum-total"><span>Paid via Paystack</span><span>{{ order.amount_payable|naira }}</span></div></div>
+    <div class="card"><h3>Customer &amp; delivery</h3><p><a href="{% url 'dashboard:customer_detail' order.user_id %}">{{ order.full_name }}</a><br>{{ order.email }} &middot; {{ order.phone }}<br>{{ order.address }}, {{ order.city }}, {{ order.state }}</p>{% if order.notes %}<p class="muted">Instructions: {{ order.notes }}</p>{% endif %}</div>
+    <div class="card"><h3>Payments</h3>{% for t in order.transactions.all %}<div class="row between small" style="padding:6px 0"><span>{{ t.reference }}</span><span>{{ t.amount|naira }}</span><span class="status {{ t.status }}">{{ t.get_status_display }}</span><span class="muted">{{ t.channel }} {{ t.gateway_response }}</span></div>{% empty %}<p class="muted">No Paystack transactions{% if order.wallet_amount %} (paid with wallet credit){% endif %}.</p>{% endfor %}</div>
+    <div class="card"><h3>History</h3><ul class="small" style="padding-left:18px">{% for h in order.history.all %}<li>{{ h.created_at|date:"j M, H:i" }} &mdash; <b>{{ h.get_status_display }}</b>{% if h.note %} ({{ h.note }}){% endif %}{% if h.created_by %} by {{ h.created_by.email }}{% endif %}</li>{% endfor %}</ul></div>
+  </div>
+  <div class="card stack"><h3>Update status</h3>
+    {% if allowed %}
+    <form method="post" action="{% url 'dashboard:order_status' order.number %}" class="stack">{% csrf_token %}
+      <div class="field"><label for="id_status">New status</label><select class="form-control" name="status" id="id_status">{% for v, l in form.fields.status.choices %}{% if v in allowed %}<option value="{{ v }}">{{ l }}</option>{% endif %}{% endfor %}</select></div>
+      <div class="field"><label>Carrier</label><input class="form-control" name="carrier" value="{{ order.carrier }}"></div>
+      <div class="field"><label>Tracking number</label><input class="form-control" name="tracking_number" value="{{ order.tracking_number }}"></div>
+      <div class="field"><label>Delivery estimate</label><input class="form-control" name="delivery_estimate" value="{{ order.delivery_estimate }}" placeholder="e.g. 2-3 working days"></div>
+      <div class="field"><label>Note (kept in history)</label><input class="form-control" name="note"></div>
+      <button class="btn btn-navy" data-confirm="Change this order's status? The customer will be notified.">Update &amp; notify customer</button>
+    </form>
+    {% else %}<p class="muted">No further status changes are available.</p>{% endif %}
+    <p class="help">Cancelling returns stock and any referral wallet credit used. Refunding a card payment must also be done in your Paystack dashboard.</p>
+  </div>
+</div>
+{% endblock %}

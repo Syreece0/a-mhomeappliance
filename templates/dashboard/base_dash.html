@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{% block dtitle %}Dashboard{% endblock %} - {{ biz.business_name }} admin{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+{% with rn=request.resolver_match.url_name %}
+<div class="dash">
+  <aside class="dash-side" aria-label="Admin navigation">
+    <a href="{% url 'dashboard:overview' %}" class="{% if rn == 'overview' %}active{% endif %}">&#128202; Overview</a>
+    <h6>Catalogue</h6>
+    <a href="{% url 'dashboard:product_list' %}" class="{% if 'product' in rn %}active{% endif %}">Products</a>
+    <a href="{% url 'dashboard:category_list' %}" class="{% if 'category' in rn %}active{% endif %}">Categories</a>
+    <a href="{% url 'dashboard:inventory_log' %}" class="{% if rn == 'inventory_log' %}active{% endif %}">Inventory log</a>
+    <a href="{% url 'dashboard:review_list' %}" class="{% if 'review' in rn %}active{% endif %}">Reviews</a>
+    <h6>Sales</h6>
+    <a href="{% url 'dashboard:order_list' %}" class="{% if 'order' in rn %}active{% endif %}">Orders</a>
+    <a href="{% url 'dashboard:transactions' %}" class="{% if rn == 'transactions' %}active{% endif %}">Payments</a>
+    <a href="{% url 'dashboard:customer_list' %}" class="{% if 'customer' in rn %}active{% endif %}">Customers</a>
+    <a href="{% url 'dashboard:referrals' %}" class="{% if rn == 'referrals' %}active{% endif %}">Referrals</a>
+    <h6>Marketing</h6>
+    <a href="{% url 'dashboard:promotion_list' %}" class="{% if 'promotion' in rn %}active{% endif %}">Promotions</a>
+    <a href="{% url 'dashboard:banner_list' %}" class="{% if 'banner' in rn %}active{% endif %}">Banners</a>
+    <a href="{% url 'dashboard:campaign_list' %}" class="{% if 'campaign' in rn %}active{% endif %}">Email campaigns</a>
+    <a href="{% url 'dashboard:email_history' %}" class="{% if rn == 'email_history' %}active{% endif %}">Email history</a>
+    <a href="{% url 'dashboard:abandoned_cart' %}" class="{% if rn == 'abandoned_cart' %}active{% endif %}">Email automation</a>
+    {% if perms.core.change_sitepage %}
+    <h6>Website content</h6>
+    <a href="{% url 'dashboard:content_home' %}" class="{% if rn == 'content_home' %}active{% endif %}">Overview</a>
+    <a href="{% url 'dashboard:content_page' 'about-us' %}" class="{% if request.resolver_match.kwargs.slug == 'about-us' %}active{% endif %}">About Us</a>
+    <a href="{% url 'dashboard:content_home' %}#policies">Privacy &amp; policies</a>
+    <a href="{% url 'dashboard:content_contact' %}" class="{% if rn == 'content_contact' %}active{% endif %}">Contact information</a>
+    {% endif %}
+    <h6>Business</h6>
+    <a href="{% url 'dashboard:settings' %}" class="{% if rn == 'settings' %}active{% endif %}">Settings</a>
+    <a href="{% url 'core:home' %}">&larr; View store</a>
+  </aside>
+  <div class="dash-main">{% block dash %}{% endblock %}</div>
+</div>
+{% endwith %}
+{% endblock %}

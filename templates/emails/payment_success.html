@@ -1,0 +1,15 @@
+{% extends "emails/base_email.html" %}
+{% load am_tags %}
+{% block body %}
+<h1 style="font-family:Georgia,serif;font-size:24px;margin:0 0 12px;">Payment confirmed &#10003;</h1>
+<p>Hi {{ order.full_name }}, we have received your payment. Thank you!</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="font-size:14px;margin:8px 0 4px;">
+  <tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Order number</td><td><strong>{{ order.number }}</strong></td></tr>
+  <tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Amount paid</td><td><strong>{{ order.amount_payable|naira }}</strong>{% if order.wallet_amount %} (+ {{ order.wallet_amount|naira }} referral wallet){% endif %}</td></tr>
+  <tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Payment reference</td><td>{{ reference }}</td></tr>
+  <tr><td style="padding:3px 18px 3px 0;color:#5a6b84;">Date</td><td>{{ paid_on|date:"j M Y, g:i A" }}</td></tr>
+</table>
+{% include "emails/_lines.html" %}
+<p style="margin:0;"><strong>Delivery to:</strong> {{ order.address }}, {{ order.city }}, {{ order.state }}.{% if order.delivery_estimate %} Estimated delivery: {{ order.delivery_estimate }}.{% else %} We'll email you when your order ships.{% endif %}</p>
+{% include "emails/_button.html" with url=order_url label="View Order" %}
+{% endblock %}

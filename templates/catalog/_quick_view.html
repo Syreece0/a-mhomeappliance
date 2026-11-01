@@ -1,0 +1,16 @@
+{% load am_tags %}
+<div class="pd" style="padding:0;gap:28px">
+  <div class="gallery"><div class="main"><img src="{{ product.image_url }}" alt="{{ product.name }}"></div></div>
+  <div class="stack">
+    {% if product.brand %}<span class="pbrand">{{ product.brand }}</span>{% endif %}
+    <h2 style="margin:0">{{ product.name }}</h2>
+    {% if product.review_count %}<div class="stars">{{ product.avg_rating|stars }}<small>({{ product.review_count }})</small></div>{% endif %}
+    <div class="price"><b style="font-size:1.7rem">{{ product.price|naira }}</b>{% if product.discount_percent %}<s>{{ product.previous_price|naira }}</s><span class="tag red">-{{ product.discount_percent }}%</span>{% endif %}</div>
+    <p class="muted">{{ product.description|truncatechars:220 }}</p>
+    {% if product.stock > 0 %}<span class="stock in">In stock</span>{% else %}<span class="stock out">Out of stock</span>{% endif %}
+    <div class="row">
+      <form method="post" action="{% url 'cart:add' %}" data-ajax-cart>{% csrf_token %}<input type="hidden" name="product_id" value="{{ product.pk }}"><button class="btn btn-navy" type="submit" {% if product.stock <= 0 %}disabled{% endif %}>Add to cart</button></form>
+      <a class="btn btn-ghost" href="{{ product.get_absolute_url }}">Full details</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Email preferences - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container"><div class="auth-wrap"><div class="card center stack">
+  {% if state == "confirm" %}
+    <h1 style="font-size:2rem">Unsubscribe from promotions?</h1>
+    <p class="muted">{{ email }} will stop receiving offers and promotional emails. You'll still get order, payment and account emails.</p>
+    <form method="post">{% csrf_token %}<button class="btn btn-navy" type="submit">Yes, unsubscribe me</button></form>
+  {% elif state == "done" %}
+    <div style="font-size:3rem">&#9989;</div><h1 style="font-size:2rem">You're unsubscribed</h1>
+    <p class="muted">{{ email }} won't receive promotional emails anymore. Order and account emails will continue.</p>
+    <a class="btn btn-ghost" href="{% url 'core:home' %}">Back to the shop</a>
+  {% else %}
+    <h1 style="font-size:2rem">Link not valid</h1><p class="muted">This unsubscribe link is invalid. Log in and untick promotional emails under Profile.</p>
+  {% endif %}
+</div></div></div>
+{% endblock %}

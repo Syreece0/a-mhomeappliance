@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}Contact us - {{ biz.business_name }}{% endblock %}
+{% block meta_desc %}Contact {{ biz.business_name }} by phone, WhatsApp or email.{% endblock %}
+{% block content %}
+<section class="page-hero compact"><div class="container">
+  <span class="eyebrow" data-anim="left">Get in touch</span>
+  <h1 data-anim="bottom">Contact us</h1>
+  <p class="lead" data-anim="bottom" style="--d:120ms">Questions about a product, an order or a payment? We are here to help.</p>
+</div></section>
+<div class="container section">
+  {% if biz.contact_instructions %}<p class="contact-note card" data-anim="bottom">{{ biz.contact_instructions|linebreaksbr }}</p>{% endif %}
+  <div class="contact-grid" data-anim-group="0">
+    {% if biz.phone %}<div class="card contact-card" data-anim="auto"><div class="ico">&#9742;</div><h3>Call us</h3><p><a href="tel:{{ biz.phone|cut:' ' }}">{{ biz.phone }}</a></p></div>{% endif %}
+    {% if biz.whatsapp_digits %}<div class="card contact-card" data-anim="auto"><div class="ico">&#128172;</div><h3>WhatsApp</h3><p>Chat with our team.</p><a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="{% whatsapp_url biz.whatsapp_digits 'Hello, I would like to make an enquiry.' %}">Start a chat</a></div>{% endif %}
+    {% if biz.email %}<div class="card contact-card" data-anim="auto"><div class="ico">&#9993;</div><h3>Email</h3><p><a href="mailto:{{ biz.email }}">{{ biz.email }}</a></p></div>{% endif %}
+    {% if biz.address %}<div class="card contact-card" data-anim="auto"><div class="ico">&#128205;</div><h3>Visit us</h3><p>{{ biz.address|linebreaksbr }}</p></div>{% endif %}
+    {% if biz.opening_hours %}<div class="card contact-card" data-anim="auto"><div class="ico">&#128339;</div><h3>Opening hours</h3><p>{{ biz.opening_hours|linebreaksbr }}</p></div>{% endif %}
+  </div>
+  {% if biz.facebook_url or biz.instagram_url or biz.twitter_url or biz.tiktok_url or biz.youtube_url %}
+  <div class="card mt" data-anim="bottom"><h3>Follow us</h3><div class="row">
+    {% if biz.facebook_url %}<a class="btn btn-ghost btn-sm" href="{{ biz.facebook_url }}" rel="noopener" target="_blank">Facebook</a>{% endif %}
+    {% if biz.instagram_url %}<a class="btn btn-ghost btn-sm" href="{{ biz.instagram_url }}" rel="noopener" target="_blank">Instagram</a>{% endif %}
+    {% if biz.twitter_url %}<a class="btn btn-ghost btn-sm" href="{{ biz.twitter_url }}" rel="noopener" target="_blank">X</a>{% endif %}
+    {% if biz.tiktok_url %}<a class="btn btn-ghost btn-sm" href="{{ biz.tiktok_url }}" rel="noopener" target="_blank">TikTok</a>{% endif %}
+    {% if biz.youtube_url %}<a class="btn btn-ghost btn-sm" href="{{ biz.youtube_url }}" rel="noopener" target="_blank">YouTube</a>{% endif %}
+  </div></div>{% endif %}
+  {% if not biz.phone and not biz.email and not biz.address and not biz.whatsapp_digits %}
+  <div class="empty"><div class="big">&#9993;</div><h3>Contact details coming soon</h3><p>Please check back shortly.</p></div>{% endif %}
+  <p class="small muted mt">See also: <a href="{% url 'core:policies' %}" style="color:var(--gold-ink);font-weight:800">our policies</a> &middot; <a href="{% url 'core:about' %}" style="color:var(--gold-ink);font-weight:800">about us</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}{% if active_category %}{{ active_category.name }}{% elif q %}Search: {{ q }}{% else %}Shop{% endif %} - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<section class="shop-head">
+  <div class="container shop-head-grid">
+    <div class="shop-title" data-anim="left">
+      <h1>{% if active_category %}{{ active_category.name }}{% elif q %}Results for &ldquo;{{ q }}&rdquo;{% else %}All Products{% endif %}</h1>
+      <p class="muted">{{ page.paginator.count }} product{{ page.paginator.count|pluralize }} available{% if filters_active %} &middot; <a class="fclear" href="?{% url_replace brand=None min_price=None max_price=None availability=None discounted=None page=None %}">Clear Filters</a>{% endif %}</p>
+    </div>
+
+    <form method="get" class="filter-bar" id="filter-form" aria-label="Filter and sort products" data-anim="right">
+      {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+      {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
+
+      <details class="fdrop" id="price-drop" {% if filters.min_price or filters.max_price %}data-active{% endif %}>
+        <summary class="fctl"><span class="fcap">Price Range</span>
+          <span class="fval">{% if filters.min_price or filters.max_price %}{% if filters.min_price %}&#8358;{{ filters.min_price }}{% else %}Any{% endif %} &ndash; {% if filters.max_price %}&#8358;{{ filters.max_price }}{% else %}Any{% endif %}{% else %}Any price{% endif %}</span></summary>
+        <div class="fpanel">
+          <div class="fprice">
+            <label><span class="small muted">Minimum (&#8358;)</span><input class="form-control" type="number" inputmode="numeric" min="0" step="any" name="min_price" placeholder="0" value="{{ filters.min_price }}"></label>
+            <label><span class="small muted">Maximum (&#8358;)</span><input class="form-control" type="number" inputmode="numeric" min="0" step="any" name="max_price" placeholder="Any" value="{{ filters.max_price }}"></label>
+          </div>
+          <button class="btn btn-navy btn-sm btn-block" type="submit">Apply price range</button>
+        </div>
+      </details>
+
+      <label class="fctl fsel"><span class="fcap">Brand</span>
+        <select name="brand" aria-label="Brand"><option value="">All brands</option>{% for b in brands %}<option value="{{ b }}" {% if filters.brand|lower == b|lower %}selected{% endif %}>{{ b }}</option>{% endfor %}</select></label>
+
+      <label class="fctl fsel"><span class="fcap">Availability</span>
+        <select name="availability" aria-label="Availability">
+          <option value="" {% if not filters.availability %}selected{% endif %}>All</option>
+          <option value="in_stock" {% if filters.availability == "in_stock" %}selected{% endif %}>In stock</option>
+          <option value="out_of_stock" {% if filters.availability == "out_of_stock" %}selected{% endif %}>Out of stock</option>
+        </select></label>
+
+      <label class="fctl fsel"><span class="fcap">Discount</span>
+        <select name="discounted" aria-label="Discount">
+          <option value="" {% if not filters.discounted %}selected{% endif %}>All products</option>
+          <option value="1" {% if filters.discounted == "1" %}selected{% endif %}>Discounted only</option>
+        </select></label>
+
+      <label class="fctl fsel"><span class="fcap">Sort By</span>
+        <select name="sort" aria-label="Sort by">{% for val, label in sort_choices %}<option value="{{ val }}" {% if sort == val %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+
+      <div class="fact">
+        <button class="btn btn-gold btn-sm" type="submit">Apply Filters</button>
+      </div>
+    </form>
+  </div>
+  {% if subcategories %}
+  <div class="container"><nav class="subcats" aria-label="Sub-categories">
+    <a href="?category={{ parent_category.slug }}" class="{% if active_category.pk == parent_category.pk %}active{% endif %}">All {{ parent_category.name }}</a>
+    {% for c in subcategories %}<a href="?category={{ c.slug }}" class="{% if active_category.pk == c.pk %}active{% endif %}">{{ c.name }}</a>{% endfor %}
+  </nav></div>{% endif %}
+</section>
+
+<div class="container shop-body">
+  {% if products %}
+  <div class="grid" data-anim-group="0">{% for product in products %}{% include "catalog/_product_card.html" with anim="auto" %}{% endfor %}</div>
+  {% if page.has_other_pages %}
+  <nav class="pager" aria-label="Pagination">
+    {% if page.has_previous %}<a href="?{% url_replace page=page.previous_page_number %}">&larr; Prev</a>{% endif %}
+    {% for n in page.paginator.page_range %}{% if n == page.number %}<span class="current" aria-current="page">{{ n }}</span>{% elif n > page.number|add:"-3" and n < page.number|add:"3" %}<a href="?{% url_replace page=n %}">{{ n }}</a>{% endif %}{% endfor %}
+    {% if page.has_next %}<a href="?{% url_replace page=page.next_page_number %}">Next &rarr;</a>{% endif %}
+  </nav>{% endif %}
+  {% else %}
+  <div class="empty"><div class="big">&#128722;</div><h3>No products found</h3><p>Try a different search or clear your filters.</p>
+    <a class="btn btn-navy" href="{% url 'catalog:list' %}">Browse all products</a></div>
+  {% endif %}
+</div>
+{% endblock %}

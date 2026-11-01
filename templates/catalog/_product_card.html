@@ -1,0 +1,31 @@
+{% load am_tags %}
+<article class="pcard" {% if anim %}data-anim="{{ anim }}"{% endif %}>
+  <div class="pimg">
+    <div class="pbadges">
+      {% if product.discount_percent %}<span class="tag red">-{{ product.discount_percent }}%</span>{% endif %}
+      {% if product.is_new_arrival %}<span class="tag gold">New</span>{% endif %}
+      {% if product.is_best_seller %}<span class="tag">Best seller</span>{% endif %}
+    </div>
+    <div class="pactions">
+      <form method="post" action="{% url 'wishlist:toggle' %}" data-ajax-wish>{% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.pk }}"><input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="{% if product.pk in wishlist_ids %}on{% endif %}" aria-label="Add {{ product.name }} to wishlist" aria-pressed="{% if product.pk in wishlist_ids %}true{% else %}false{% endif %}">&#9829;</button>
+      </form>
+      <button type="button" data-quick="{% url 'catalog:quick_view' product.slug %}" aria-label="Quick view {{ product.name }}">&#128065;</button>
+    </div>
+    <a href="{{ product.get_absolute_url }}" tabindex="-1" aria-hidden="true"><img class="float" src="{{ product.image_url }}" alt="" loading="lazy"></a>
+  </div>
+  <div class="pbody">
+    {% if product.brand %}<div class="pbrand">{{ product.brand }}</div>{% endif %}
+    <a class="pname" href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+    {% if product.review_count %}<div class="stars" aria-label="Rated {{ product.avg_rating|floatformat:1 }} out of 5">{{ product.avg_rating|stars }}<small>({{ product.review_count }})</small></div>{% endif %}
+    <div class="price"><b>{{ product.price|naira }}</b>{% if product.discount_percent %}<s>{{ product.previous_price|naira }}</s>{% endif %}</div>
+    {% if product.stock <= 0 %}<span class="stock out">Out of stock</span>
+    {% elif product.stock <= biz.low_stock_threshold %}<span class="stock low">Only {{ product.stock }} left</span>
+    {% else %}<span class="stock in">In stock</span>{% endif %}
+    <form method="post" action="{% url 'cart:add' %}" data-ajax-cart>{% csrf_token %}
+      <input type="hidden" name="product_id" value="{{ product.pk }}"><input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="btn btn-navy btn-block" type="submit" {% if product.stock <= 0 %}disabled{% endif %}>Add to cart</button>
+    </form>
+  </div>
+</article>

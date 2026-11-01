@@ -1,0 +1,8 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Campaign{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">{% if campaign %}Edit campaign{% else %}New campaign{% endif %}</h1>
+<form method="post" enctype="multipart/form-data" class="card stack" style="max-width:860px">{% csrf_token %}{% include "dashboard/_fields.html" %}
+  <p class="help">Only people who opted in receive campaigns, and anyone on the unsubscribe list is always excluded. Save as a draft first to preview and send yourself a test.</p>
+  <div class="row"><button class="btn btn-navy">Save</button><a class="btn btn-ghost" href="{% url 'dashboard:campaign_list' %}">Cancel</a></div></form>
+{% endblock %}

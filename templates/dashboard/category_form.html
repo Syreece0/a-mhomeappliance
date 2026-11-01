@@ -1,0 +1,7 @@
+{% extends "dashboard/base_dash.html" %}
+{% block dtitle %}Category{% endblock %}
+{% block dash %}
+<h1 style="font-size:2rem">{% if category %}Edit category{% else %}New category{% endif %}</h1>
+<form method="post" enctype="multipart/form-data" class="card stack" style="max-width:720px">{% csrf_token %}{% include "dashboard/_fields.html" %}
+  <div class="row"><button class="btn btn-navy">Save</button><a class="btn btn-ghost" href="{% url 'dashboard:category_list' %}">Cancel</a></div></form>
+{% endblock %}

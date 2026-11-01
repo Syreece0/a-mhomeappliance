@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Notifications - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding-bottom:64px;max-width:860px">
+  <div class="row between" style="padding-top:28px"><h1 style="font-size:clamp(1.6rem,3vw,2.3rem);margin:0">Notifications</h1>
+    <div class="row"><a class="btn btn-sm btn-ghost" href="?filter={% if filter == 'unread' %}{% else %}unread{% endif %}">{% if filter == 'unread' %}Show all{% else %}Unread only{% endif %}</a>
+      <form method="post" action="{% url 'notifications:mark_all' %}">{% csrf_token %}<button class="btn btn-sm btn-navy">Mark all as read</button></form></div></div>
+  <div class="stack mt">
+    {% for n in page.object_list %}
+    <div class="card row between" style="padding:16px;{% if not n.is_read %}border-color:var(--gold){% endif %}">
+      <a href="{% url 'notifications:open' n.pk %}" style="flex:1;min-width:220px"><strong>{{ n.title }}</strong>{% if not n.is_read %} <span class="tag gold">New</span>{% endif %}
+        <div class="muted small">{{ n.message }}</div><div class="muted small">{{ n.get_kind_display }} &middot; {{ n.created_at|date:"j M Y, H:i" }}</div></a>
+      <div class="row">{% if not n.is_read %}<form method="post" action="{% url 'notifications:mark_read' n.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm btn-ghost">Mark read</button></form>{% endif %}
+        <form method="post" action="{% url 'notifications:delete' n.pk %}">{% csrf_token %}<button class="btn btn-sm btn-ghost" aria-label="Delete notification">&#128465;</button></form></div>
+    </div>
+    {% empty %}<div class="empty"><div class="big">&#128276;</div><p>You're all caught up.</p></div>{% endfor %}
+  </div>
+  {% if page.has_other_pages %}<nav class="pager">{% if page.has_previous %}<a href="?page={{ page.previous_page_number }}{% if filter %}&filter={{ filter }}{% endif %}">&larr; Prev</a>{% endif %}<span class="current">{{ page.number }}</span>{% if page.has_next %}<a href="?page={{ page.next_page_number }}{% if filter %}&filter={{ filter }}{% endif %}">Next &rarr;</a>{% endif %}</nav>{% endif %}
+</div>
+{% endblock %}

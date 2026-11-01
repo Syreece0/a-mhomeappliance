@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load am_tags %}
+{% block title %}Referrals &amp; wallet - {{ biz.business_name }}{% endblock %}
+{% block content %}
+<div class="container" style="padding-bottom:64px">
+  <h1 style="font-size:clamp(1.6rem,3vw,2.3rem);padding-top:28px">Referrals &amp; wallet</h1>
+  <div class="cart-layout" style="padding-top:8px">
+    <section class="stack">
+      <div class="card stack">
+        <h3>Your referral code</h3>
+        <div class="code-box"><span>{{ code }}</span><button class="btn btn-sm btn-navy" type="button" data-copy="{{ code }}">Copy code</button></div>
+        <div class="field"><label>Your referral link</label><div class="row" style="flex-wrap:nowrap"><input class="form-control" readonly value="{{ link }}" aria-label="Referral link"><button class="btn btn-ghost" type="button" data-copy="{{ link }}">Copy link</button></div></div>
+        <div class="share-row"><a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="{{ share.whatsapp }}">WhatsApp</a><a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="{{ share.facebook }}">Facebook</a><a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="{{ share.twitter }}">X / Twitter</a><a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="{{ share.telegram }}">Telegram</a><a class="btn btn-ghost btn-sm" href="{{ share.email }}">Email</a></div>
+        <p class="help">You earn a reward when someone who registers through your link completes their <b>first successful purchase</b>. Registering or visiting your link alone doesn't earn rewards, and each person can only earn you one reward.</p>
+      </div>
+      <div class="card"><h3>Transaction history</h3>
+        {% if page.object_list %}<div class="table-wrap" style="border:0"><table class="table"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Balance</th></tr></thead><tbody>
+          {% for t in page.object_list %}<tr><td>{{ t.created_at|date:"j M Y, H:i" }}</td><td>{{ t.get_kind_display }}{% if t.note %}<div class="small muted">{{ t.note }}</div>{% endif %}</td><td style="color:{% if t.amount > 0 %}var(--ok){% else %}var(--danger){% endif %};font-weight:800">{% if t.amount > 0 %}+{% endif %}{{ t.amount|naira }}</td><td>{{ t.balance_after|naira }}</td></tr>{% endfor %}
+        </tbody></table></div>
+        {% if page.has_other_pages %}<nav class="pager">{% if page.has_previous %}<a href="?page={{ page.previous_page_number }}">&larr;</a>{% endif %}<span class="current">{{ page.number }}</span>{% if page.has_next %}<a href="?page={{ page.next_page_number }}">&rarr;</a>{% endif %}</nav>{% endif %}
+        {% else %}<p class="muted">No wallet activity yet.</p>{% endif %}
+      </div>
+    </section>
+    <aside class="stack">
+      <div class="stat gold"><small>Available balance</small><b>{{ wallet.balance|naira }}</b><span class="small" style="color:#cbd7ea">Store credit &mdash; use it at checkout. Not withdrawable.</span></div>
+      <div class="stat-grid" style="grid-template-columns:1fr 1fr">
+        <div class="stat"><small>People referred</small><b>{{ stats.total }}</b></div><div class="stat"><small>Successful</small><b>{{ stats.successful }}</b></div>
+        <div class="stat"><small>Pending</small><b>{{ stats.pending }}</b></div><div class="stat"><small>Total earned</small><b style="font-size:1.2rem">{{ wallet.total_earned|naira }}</b></div>
+        <div class="stat" style="grid-column:1/-1"><small>Total spent</small><b style="font-size:1.2rem">{{ wallet.total_spent|naira }}</b></div>
+      </div>
+      {% if referred %}<div class="card"><h3>People you referred</h3>{% for r in referred %}<div class="row between" style="padding:6px 0"><span>{{ r.referred.display_name }}</span><span class="status {{ r.status }}">{{ r.get_status_display }}</span></div>{% endfor %}</div>{% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
