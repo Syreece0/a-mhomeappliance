@@ -6,3 +6,8 @@ db.sqlite3
 media/
 test_media/
 staticfiles/
+venv/
+env/
+.idea/
+.vscode/
+*.sqlite3
