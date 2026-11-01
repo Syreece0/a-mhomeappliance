@@ -159,8 +159,9 @@ if CLOUDINARY_URL:
     import os as _os
 
     _os.environ["CLOUDINARY_URL"] = CLOUDINARY_URL  # the cloudinary library reads its credentials from here
-    # cloudinary_storage must come before staticfiles; cloudinary after it.
-    INSTALLED_APPS = ["cloudinary_storage"] + INSTALLED_APPS + ["cloudinary"]
+    # Media only goes to Cloudinary (static files stay with WhiteNoise), so both apps go AFTER staticfiles.
+    # Putting cloudinary_storage first would replace Django's collectstatic command during the build.
+    INSTALLED_APPS = INSTALLED_APPS + ["cloudinary_storage", "cloudinary"]
     STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
     if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
         CLOUDINARY_STORAGE = {
