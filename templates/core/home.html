@@ -46,6 +46,15 @@
 <section class="section" id="categories">
   <div class="container">
     <div class="section-head" data-anim="bottom"><h2>Shop by Category</h2><a class="link-arrow" href="{% url 'catalog:list' %}">All products &rarr;</a></div>
+    {% if categories %}
+    <details class="cat-drop">
+      <summary>Choose a category</summary>
+      <ul>
+        {% for c in categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}
+        <li><a href="{% url 'catalog:list' %}"><strong>All products</strong></a></li>
+      </ul>
+    </details>
+    {% endif %}
     <div class="cat-grid" data-anim-group="0">
       {% for c in categories %}
       <a class="cat-tile" data-anim="auto" href="{{ c.get_absolute_url }}">
